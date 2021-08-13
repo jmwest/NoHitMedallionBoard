@@ -29,56 +29,60 @@ public class NoHitMedallionBoard {
 		GroupLayout layout = new GroupLayout(panel);
 		
 		zootCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
-				"/Volumes/Seagate 2 TB Storage/300px-Light-Medallion.png");
+				"/Volumes/Seagate 2 TB Storage/Ocarina_of_Time.png");
 		mmCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
-				"/Volumes/Seagate 2 TB Storage/Moon.png");
+				"/Volumes/Seagate 2 TB Storage/Majoras_Mask.png");
 		wwCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
-				"/Volumes/Seagate 2 TB Storage/Moon.png");
+				"/Volumes/Seagate 2 TB Storage/Wind_Waker.png");
 		tpCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
-				"/Volumes/Seagate 2 TB Storage/Moon.png");
+				"/Volumes/Seagate 2 TB Storage/Fusedshadow.png");
 		ssCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
-				"/Volumes/Seagate 2 TB Storage/Moon.png");
+				"/Volumes/Seagate 2 TB Storage/SS_Zelda.png");
 		botwCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
-				"/Volumes/Seagate 2 TB Storage/Moon.png");
+				"/Volumes/Seagate 2 TB Storage/Hestus_Gift.png");
 
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 		
 		layout.setHorizontalGroup(
-				layout.createParallelGroup()
-						.addGroup(layout.createSequentialGroup()
+				layout.createSequentialGroup()
+						.addGroup(layout.createParallelGroup()
 								.addGroup(layout.createParallelGroup(Alignment.CENTER)
 										.addComponent(zootCombo.getMedallionTextArea())
 										.addComponent(zootCombo.getMedallionButton())
 								)
-								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
-								.addGroup(layout.createParallelGroup(Alignment.CENTER)
-										.addComponent(mmCombo.getMedallionTextArea())
-										.addComponent(mmCombo.getMedallionButton())
-								)
-								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
-								.addGroup(layout.createParallelGroup(Alignment.CENTER)
-										.addComponent(wwCombo.getMedallionTextArea())
-										.addComponent(wwCombo.getMedallionButton())
-								)
-								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
-								.addGroup(layout.createParallelGroup(Alignment.CENTER)
-										.addComponent(tpCombo.getMedallionTextArea())
-										.addComponent(tpCombo.getMedallionButton())
-								)
-						)
-						.addGroup(layout.createSequentialGroup()
 								.addGroup(layout.createParallelGroup(Alignment.CENTER)
 										.addComponent(ssCombo.getMedallionTextArea())
 										.addComponent(ssCombo.getMedallionButton())
 								)
-								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+						)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+						.addGroup(layout.createParallelGroup()
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(mmCombo.getMedallionTextArea())
+										.addComponent(mmCombo.getMedallionButton())
+								)
 								.addGroup(layout.createParallelGroup(Alignment.CENTER)
 										.addComponent(botwCombo.getMedallionTextArea())
 										.addComponent(botwCombo.getMedallionButton())
 								)
 						)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+						.addGroup(layout.createParallelGroup()
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(wwCombo.getMedallionTextArea())
+										.addComponent(wwCombo.getMedallionButton())
+								)
+						)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+						.addGroup(layout.createParallelGroup()
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(tpCombo.getMedallionTextArea())
+										.addComponent(tpCombo.getMedallionButton())
+								)
+						)
 		);
+		
 		layout.setVerticalGroup(
 				layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup()
