@@ -1,59 +1,126 @@
 package noHitMedallionBoard;
 
-import noHitMedallionBoard.*;
-
 import java.awt.*;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class NoHitMedallionBoard {
 
 	private JFrame frame;
-	//private JPanel panel;
-	private noHitMedallionBoard.MedallionPanel panel;
-	//private MedallionPanel zootPanel;
-	//private MedallionPanel mmPanel;
-	
+	private JPanel panel;
+	private noHitMedallionBoard.MedallionCombo zootCombo;
+	private noHitMedallionBoard.MedallionCombo mmCombo;
+	private noHitMedallionBoard.MedallionCombo wwCombo;
+	private noHitMedallionBoard.MedallionCombo tpCombo;
+	private noHitMedallionBoard.MedallionCombo ssCombo;
+	private noHitMedallionBoard.MedallionCombo botwCombo;
+
 	public NoHitMedallionBoard() {
 		
 		frame = new JFrame();
-		//panel = new JPanel();
-		panel = new noHitMedallionBoard.MedallionPanel("The Legend of Zelda: Ocarina of Time",
-				"/Volumes/Seagate 2 TB Storage/300px-Light-Medallion.png");
+		panel = new JPanel();
+		GroupLayout layout = new GroupLayout(panel);
 		
-		/*zootPanel = new MedallionPanel("The Legend of Zelda: Ocarina of Time",
+		zootCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
 				"/Volumes/Seagate 2 TB Storage/300px-Light-Medallion.png");
-		mmPanel = new MedallionPanel("The Legend of Zelda: Majora's Mask",
+		mmCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
 				"/Volumes/Seagate 2 TB Storage/Moon.png");
-		*/
-		/*
+		wwCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
+				"/Volumes/Seagate 2 TB Storage/Moon.png");
+		tpCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
+				"/Volumes/Seagate 2 TB Storage/Moon.png");
+		ssCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
+				"/Volumes/Seagate 2 TB Storage/Moon.png");
+		botwCombo = new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
+				"/Volumes/Seagate 2 TB Storage/Moon.png");
+
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
+		
+		layout.setHorizontalGroup(
+				layout.createParallelGroup()
+						.addGroup(layout.createSequentialGroup()
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(zootCombo.getMedallionTextArea())
+										.addComponent(zootCombo.getMedallionButton())
+								)
+								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(mmCombo.getMedallionTextArea())
+										.addComponent(mmCombo.getMedallionButton())
+								)
+								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(wwCombo.getMedallionTextArea())
+										.addComponent(wwCombo.getMedallionButton())
+								)
+								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(tpCombo.getMedallionTextArea())
+										.addComponent(tpCombo.getMedallionButton())
+								)
+						)
+						.addGroup(layout.createSequentialGroup()
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(ssCombo.getMedallionTextArea())
+										.addComponent(ssCombo.getMedallionButton())
+								)
+								.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40)
+								.addGroup(layout.createParallelGroup(Alignment.CENTER)
+										.addComponent(botwCombo.getMedallionTextArea())
+										.addComponent(botwCombo.getMedallionButton())
+								)
+						)
+		);
+		layout.setVerticalGroup(
+				layout.createSequentialGroup()
+						.addGroup(layout.createParallelGroup()
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(zootCombo.getMedallionTextArea())
+										.addComponent(zootCombo.getMedallionButton())
+								)
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(mmCombo.getMedallionTextArea())
+										.addComponent(mmCombo.getMedallionButton())
+								)
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(wwCombo.getMedallionTextArea())
+										.addComponent(wwCombo.getMedallionButton())
+								)
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(tpCombo.getMedallionTextArea())
+										.addComponent(tpCombo.getMedallionButton())
+								)
+						)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 60, 60)
+						.addGroup(layout.createParallelGroup()
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(ssCombo.getMedallionTextArea())
+										.addComponent(ssCombo.getMedallionButton())
+								)
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(botwCombo.getMedallionTextArea())
+										.addComponent(botwCombo.getMedallionButton())
+								)
+						)
+		);
+		
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		panel.setLayout(new GridLayout(0, 4));
-		panel.setPreferredSize(new Dimension(500, 120));
-		panel.add(zootPanel);
-		panel.add(mmPanel);
-		*/
+		panel.setLayout(layout);
+		panel.setPreferredSize(new Dimension(730, 440));
+		
 		frame.add(panel, BorderLayout.CENTER);
 		frame.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent componentEvent) {
 				
-				panel.frameResizeEvent();
-				//zootPanel.frameResizeEvent();
+				zootCombo.frameResizeEvent();
 				//mmPanel.frameResizeEvent();
 			}
 		});

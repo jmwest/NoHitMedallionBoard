@@ -7,21 +7,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
-import javax.swing.JPanel;
 
-public class MedallionPanel extends JPanel implements ActionListener {
+public class MedallionCombo implements ActionListener {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1095808259862088000L;
-
-	private JPanel medallionPanel;
 	private JButton medallionButton;
 	private JTextArea medallionText;
 	
@@ -29,28 +20,27 @@ public class MedallionPanel extends JPanel implements ActionListener {
 	private Boolean medallionBGS = true;
 	private String medallionButtonActionCommandStr;
 	
-	/*  Need to make functionality later that allows user to upload an image,
-	 *  save the image, then make a gray scale version of the image to use
-	 *  on the button.
+	/*  Need to make functionality later that allows user to:
+	 *  [] upload an image,
+	 *  [] save the image,
+	 *  [Complete] then make a gray scale version of the image to use on the button.
 	 */ 
 	private BufferedImage medallionGSBImage;
 	private BufferedImage medallionBImage;
 	
-	public MedallionPanel(String medStr, String imgSrcStr) {
-		
-		medallionPanel = new JPanel();
+	public MedallionCombo(String medStr, String imgSrcStr) {
 		
 		medallionText = new JTextArea(medStr);
-		medallionButton = new JButton();
+		setMedallionButton(new JButton());
+		
+		getMedallionButton().addActionListener(this);
 		
 		medallionText.setEditable(false);
 		medallionText.setLineWrap(true);
 		medallionText.setWrapStyleWord(true);
-		
-		medallionButton.addActionListener(this);
-		
+				
 		medallionButtonActionCommandStr = "change " + medStr + " button";
-		medallionButton.setActionCommand(medallionButtonActionCommandStr);
+		getMedallionButton().setActionCommand(medallionButtonActionCommandStr);
 		
 		// Handle image file
 		File medallionImageFile = new File(imgSrcStr);
@@ -68,23 +58,25 @@ public class MedallionPanel extends JPanel implements ActionListener {
 		
 		medallionGSBImage = getGrayScaleImage(medallionBImage);
 		
-		medallionButton.setPreferredSize(new Dimension(100,100));
-		ImageIcon medallionIcon = getScaledIcon(medallionGSBImage, medallionButton);
-		medallionButton.setIcon(medallionIcon);
+		getMedallionButton().setMinimumSize(new Dimension(100, 100));
+		getMedallionButton().setPreferredSize(new Dimension(100,100));
+		getMedallionButton().setMaximumSize(new Dimension(100,100));
 		
-		medallionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		medallionPanel.setLayout(new GridLayout(0, 1));
-		medallionPanel.add(medallionText);
-		medallionPanel.add(medallionButton);
+		getMedallionTextArea().setMinimumSize(new Dimension(150, 20));
+		getMedallionTextArea().setPreferredSize(new Dimension(150, 40));
+		getMedallionTextArea().setMaximumSize(new Dimension(150, 60));
+		
+		ImageIcon medallionIcon = getScaledIcon(medallionGSBImage, getMedallionButton());
+		getMedallionButton().setIcon(medallionIcon);
 	}
 	
 	// Public MedallionPanel functions
 	public void frameResizeEvent() {
 		if (medallionBGS) {
-			changeButtonImage(medallionButton, medallionGSBImage);
+			changeButtonImage(getMedallionButton(), medallionGSBImage);
 		}
 		else {
-			changeButtonImage(medallionButton, medallionBImage);
+			changeButtonImage(getMedallionButton(), medallionBImage);
 		}
 		
 		return;
@@ -117,7 +109,7 @@ public class MedallionPanel extends JPanel implements ActionListener {
 			h = 100;
 		}
 		
-		BufferedImage newImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		BufferedImage newImg = new BufferedImage(w, h, BufferedImage.TYPE_USHORT_555_RGB);
 		Graphics g = newImg.createGraphics();
 		g.drawImage(srcImg, 0, 0, w, h, null);
 		g.dispose();
@@ -174,6 +166,26 @@ public class MedallionPanel extends JPanel implements ActionListener {
 				changeButtonImage(bSource, medallionGSBImage);
 			}
 		}
+		
+		return;
+	}
+
+	public JButton getMedallionButton() {
+		return medallionButton;
+	}
+
+	public void setMedallionButton(JButton medallionButton) {
+		this.medallionButton = medallionButton;
+		
+		return;
+	}
+	
+	public JTextArea getMedallionTextArea() {
+		return medallionText;
+	}
+
+	public void setMedallionTextArea(JTextArea medallionTextArea) {
+		this.medallionText = medallionTextArea;
 		
 		return;
 	}
