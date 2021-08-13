@@ -20,12 +20,6 @@ public class NoHitMedallionBoard {
 	private JFrame frame;
 	private JPanel panel;
 	private ArrayList<MedallionCombo> medallionArrayList;
-	private noHitMedallionBoard.MedallionCombo zootCombo;
-	private noHitMedallionBoard.MedallionCombo mmCombo;
-	private noHitMedallionBoard.MedallionCombo wwCombo;
-	private noHitMedallionBoard.MedallionCombo tpCombo;
-	private noHitMedallionBoard.MedallionCombo ssCombo;
-	private noHitMedallionBoard.MedallionCombo botwCombo;
 
 	public NoHitMedallionBoard() {
 		
@@ -47,7 +41,7 @@ public class NoHitMedallionBoard {
 								"/Volumes/Seagate 2 TB Storage/SS_Zelda.png"));
 		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
 								"/Volumes/Seagate 2 TB Storage/Hestus_Gift.png"));
-
+		
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 		
