@@ -19,9 +19,11 @@ class TransparentFilter extends RGBImageFilter {
     // performing statistical analysis of the saturation values (and
     // possibly distances) of highly-saturated pixels contained in the image
     float saturationFudge;
+    Boolean keepColor;
 
-    TransparentFilter(float saturationFudge) {
+    TransparentFilter(float saturationFudge, Boolean keepColor) {
         this.saturationFudge=saturationFudge;
+        this.keepColor=keepColor;
         canFilterIndexColorModel=true;
     }
 
@@ -35,7 +37,20 @@ class TransparentFilter extends RGBImageFilter {
         float[] hsb=Color.RGBtoHSB(r,g,b,null);
         float fa=255f*hsb[1]/this.saturationFudge;
         int a=Math.max(0,Math.min(255,Math.round(fa)))<<TransparentFilter.aShift;
-        return a|(argb&TransparentFilter.rgbMask);
+        if (this.keepColor) {
+            return a|(argb&TransparentFilter.rgbMask);
+		}
+        else {
+        	/*
+        	if (a < 0x80<<TransparentFilter.aShift) {
+				a = 0x00<<TransparentFilter.aShift;
+			}
+        	else {
+				a = 0xff<<TransparentFilter.aShift;
+			}
+			*/
+            return a|000000;
+        }
     }
 
 }

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
-import java.awt.image.RGBImageFilter;
 import java.io.File;
 
 import javax.imageio.ImageIO;
@@ -30,6 +29,7 @@ public class MedallionCombo implements ActionListener {
 	 */ 
 	private BufferedImage medallionGSBImage;
 	private BufferedImage medallionBImage;
+	private Image medallionShadowImage;
 	
 	public MedallionCombo(String medStr, String imgSrcStr) {
 		
@@ -158,18 +158,9 @@ public class MedallionCombo implements ActionListener {
 	}
 	
 	private static BufferedImage dropShadow(BufferedImage img) {
-	    // a filter which converts all colors except 0 to black
+	    // a filter which converts all colors except 0 to black, leaving alpha in place
 
-	    ImageProducer prod = new FilteredImageSource(img.getSource(), new RGBImageFilter() {
-	        @Override
-	        public int filterRGB(int x, int y, int rgb) {
-	        	
-	            if (rgb == 0)
-	                return 0;
-	            else
-	                return 0xff000000;
-	        }
-	    });
+	    ImageProducer prod = new FilteredImageSource(img.getSource(), new TransparentFilter(0.5f, false));
 	    // create the black image
 	    Image shadow = Toolkit.getDefaultToolkit().createImage(prod);
 
