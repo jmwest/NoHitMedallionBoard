@@ -159,9 +159,11 @@ public class MedallionCombo implements ActionListener {
 	
 	private static BufferedImage dropShadow(BufferedImage img) {
 	    // a filter which converts all colors except 0 to black
+
 	    ImageProducer prod = new FilteredImageSource(img.getSource(), new RGBImageFilter() {
 	        @Override
 	        public int filterRGB(int x, int y, int rgb) {
+	        	
 	            if (rgb == 0)
 	                return 0;
 	            else
