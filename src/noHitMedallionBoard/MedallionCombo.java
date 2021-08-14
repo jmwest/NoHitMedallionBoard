@@ -73,11 +73,11 @@ public class MedallionCombo implements ActionListener {
 		/*
 		 * Remove this later. Testing CreateImageShadow.createBlackWhiteImage
 		 */
-		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, 10);
-		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, 10);
+		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, 0.01f);
+		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, 0.01f);
 
-		medallionBImage = iBShadow.getImageOutlineRaw();
-		medallionGSBImage = iGSBShadow.getImageOutlineRaw();
+		medallionBImage = iBShadow.getShadowBitSetImage();
+		medallionGSBImage = iGSBShadow.getShadowBitSetImage();
 		/*
 		 * 
 		 */

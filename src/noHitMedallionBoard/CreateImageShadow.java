@@ -2,6 +2,8 @@ package noHitMedallionBoard;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.BitSet;
 
 public class CreateImageShadow {
 	
@@ -10,11 +12,13 @@ public class CreateImageShadow {
 	
 	private BufferedImage blackWhiteImg;
 	private BufferedImage imgOutline;
+	private ArrayList<BitSet> shadowBitSet;
 	
-	public CreateImageShadow(BufferedImage img, int shadowLength) {
+	public CreateImageShadow(BufferedImage img, float shadowLengthMultiplier) {
 		
 		blackWhiteImg = createBlackWhiteImage(img);
 		imgOutline = createImageOutline(blackWhiteImg);
+		shadowBitSet = createShadowBitset(imgOutline, shadowLengthMultiplier);
 	}
 
 	// Public Functions
@@ -24,6 +28,28 @@ public class CreateImageShadow {
 	
 	public BufferedImage getImageOutlineRaw() {
 		return imgOutline;
+	}
+	
+	public BufferedImage getShadowBitSetImage() {
+		
+		int w = blackWhiteImg.getWidth();
+		int h = blackWhiteImg.getHeight();
+		BufferedImage bsimg = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+		
+		for (int i = 0; i < w; i++) {
+			
+			for (int j = 0; j < h; j++) {
+				
+				if (shadowBitSet.get(i).get(j)) {
+					bsimg.setRGB(i, j, rgbBlack);
+				}
+				else {
+					bsimg.setRGB(i, j, rgbWhite);
+				}
+			}
+		}
+		
+		return bsimg;
 	}
 	
 	// Private Functions
@@ -95,6 +121,55 @@ public class CreateImageShadow {
 		}
 		
 		return imgOutline;
+	}
+	
+	private ArrayList<BitSet> createShadowBitset(BufferedImage imgoutline, float shadowmult) {
+		
+		ArrayList<BitSet> shadowbitset = new ArrayList<BitSet>();
+		int w = imgoutline.getWidth();
+		int h = imgoutline.getHeight();
+		
+		int shadowlength = (int)(Math.sqrt(Math.multiplyExact(w, w) + Math.multiplyExact(h, h))*shadowmult);
+		
+		for (int i = 0; i < w; i++) {
+			
+			shadowbitset.add(new BitSet(h));
+		}
+		
+		System.out.println("Entering createShadowBitset loops.");
+		
+		for (int i = 0; i < w; i++) {
+			
+			for (int j = 0; j < h; j++) {
+				
+				if (imgoutline.getRGB(i, j) == rgbBlack) {
+					
+					System.out.println("Found outline.");
+					
+					for (int k = i - shadowlength; k < i + shadowlength + 1; k++) {
+						
+						for (int m = j - shadowlength; m < j + shadowlength + 1; j++) {
+							
+							if (Math.abs(i - k) + Math.abs(j - m) > shadowlength) {
+								continue;
+							}
+							else if ((k < 0) || (k > w)) {
+								continue;
+							}
+							else if ((j < 0) || (j > h)) {
+								continue;
+							}
+							
+							shadowbitset.get(k).set(m);
+						}
+					}
+				}
+			}
+		}
+		
+		System.out.println("Exiting createShadowBitset loops.");
+		
+		return shadowbitset;
 	}
 
 	private boolean isTransparent(int pixel) {
