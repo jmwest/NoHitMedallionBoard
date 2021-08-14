@@ -9,14 +9,12 @@ public class CreateImageShadow {
     final static int rgbBlack=new Color(0, 0, 0).getRGB();
 	
 	private BufferedImage blackWhiteImg;
-	private BufferedImage imgOutlineRaw;
-	private BufferedImage imgOutlineFilled;
+	private BufferedImage imgOutline;
 	
 	public CreateImageShadow(BufferedImage img, int shadowLength) {
 		
 		blackWhiteImg = createBlackWhiteImage(img);
-		imgOutlineRaw = createImageOutline(blackWhiteImg);
-		imgOutlineFilled = fillImageOutline(imgOutlineRaw);
+		imgOutline = createImageOutline(blackWhiteImg);
 	}
 
 	// Public Functions
@@ -25,11 +23,7 @@ public class CreateImageShadow {
 	}
 	
 	public BufferedImage getImageOutlineRaw() {
-		return imgOutlineRaw;
-	}
-	
-	public BufferedImage getImageOutlineFilled() {
-		return imgOutlineFilled;
+		return imgOutline;
 	}
 	
 	// Private Functions
@@ -101,17 +95,6 @@ public class CreateImageShadow {
 		}
 		
 		return imgOutline;
-	}
-	
-	private BufferedImage fillImageOutline(BufferedImage imgoutlineraw) {
-		
-		int w = imgoutlineraw.getWidth();
-		int h = imgoutlineraw.getHeight();
-		BufferedImage imgOutlineFilled = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
-		
-		
-		
-		return imgOutlineFilled;
 	}
 
 	private boolean isTransparent(int pixel) {

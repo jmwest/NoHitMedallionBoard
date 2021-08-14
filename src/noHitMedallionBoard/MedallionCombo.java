@@ -82,9 +82,9 @@ public class MedallionCombo implements ActionListener {
 		 * 
 		 */
 		
-		getMedallionButton().setMinimumSize(new Dimension(100, 100));
-		getMedallionButton().setPreferredSize(new Dimension(100,100));
-		getMedallionButton().setMaximumSize(new Dimension(100,100));
+		getMedallionButton().setMinimumSize(new Dimension(medallionGSBImage.getWidth(), medallionGSBImage.getHeight()));
+		getMedallionButton().setPreferredSize(new Dimension(medallionGSBImage.getWidth(), medallionGSBImage.getHeight()));
+		getMedallionButton().setMaximumSize(new Dimension(medallionGSBImage.getWidth(), medallionGSBImage.getHeight()));
 		
 		getMedallionTextArea().setMinimumSize(new Dimension(150, 30));
 		getMedallionTextArea().setPreferredSize(new Dimension(150, 40));
