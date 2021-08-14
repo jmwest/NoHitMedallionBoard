@@ -114,7 +114,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		}
 		
 		int caseLabelWidth = caseLeft + 10 + badgePanelWidth + 10 + caseRight;
-		int caseLabelHeight = caseTop + 10 + badgePanelHeight + 10 + caseBottom;
+		int caseLabelHeight = caseTop + 200 + 10 + badgePanelHeight + 10 + caseBottom;
 		
 		caseLabel = new JLabel(new ImageIcon(caseLabelImage));
 		caseLabel.setOpaque(false);
