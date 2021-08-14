@@ -96,7 +96,7 @@ public class MedallionCombo implements ActionListener {
 		getMedallionButton().setIcon(medallionIcon);
 	}
 	
-	// Public MedallionPanel functions
+	// Public MedallionCombo functions
 	public void frameResizeEvent() {
 		if (medallionBGS) {
 //			changeButtonImage(getMedallionButton(), medallionGSBImageWShadow);
