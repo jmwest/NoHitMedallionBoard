@@ -6,9 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout.Alignment;
@@ -27,14 +30,19 @@ public class NoHitMedallionBoard implements ActionListener {
 	private JMenuItem editMedalListMenuItem;
 
 	private JFrame frame;
-	private JPanel panel;
+	private JPanel badgePanel;
+	private JPanel casePanel;
+	private JLabel caseLabel;
+	private ImageIcon caseLabelImageIcon;
 	private ArrayList<MedallionCombo> medallionArrayList;
 
 	public NoHitMedallionBoard() {
 		
 		frame = new JFrame();
-		panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
+		badgePanel = new JPanel();
+		casePanel = new JPanel();
+		caseLabel = new JLabel();
+		//GroupLayout layout = new GroupLayout(badgePanel);
 		
 		// Menu setup
 		menuBar = new JMenuBar();
@@ -70,6 +78,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
 								"/Volumes/Seagate 2 TB Storage/Hestus_Gift.png"));
 		
+		/*
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 		
@@ -120,13 +129,35 @@ public class NoHitMedallionBoard implements ActionListener {
 		}
 		
 		layout.setVerticalGroup(columnSequentialGroup);
+		*/
 		
-		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		panel.setLayout(layout);
-		panel.setPreferredSize(new Dimension(730, 440));
+		badgePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		badgePanel.setLayout(createBadgeGroupLayout(badgePanel, medallionArrayList));
+		badgePanel.setPreferredSize(new Dimension(730, 440));
+		
+		// Handle image file
+		File caseLabelImageFile = new File("");
+		
+		try {
+			System.out.println("Canonical path of target image: " + caseLabelImageFile.getCanonicalPath());
+            if (!caseLabelImageFile.exists()) {
+                System.out.println("file " + caseLabelImageFile + " does not exist");
+            }
+            caseLabelImageIcon = new ImageIcon(ImageIO.read(caseLabelImageFile));
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
+		
+		caseLabel = new JLabel(caseLabelImageIcon);
+		
+		casePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		casePanel.setLayout(null);
+		casePanel.setPreferredSize(new Dimension(832, 623));
+		casePanel.add(caseLabel);
 		
 		frame.setJMenuBar(menuBar);
-		frame.add(panel, BorderLayout.CENTER);
+		frame.add(badgePanel, BorderLayout.CENTER);
 		frame.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent componentEvent) {
 				
@@ -150,17 +181,83 @@ public class NoHitMedallionBoard implements ActionListener {
 		new NoHitMedallionBoard();
 
 	}
+	
+	// Implement private Class functions
+	private GroupLayout createBadgeGroupLayout(JPanel panel, ArrayList<MedallionCombo> medallions) {
+		
+		GroupLayout layout = new GroupLayout(panel);
 
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
+		
+		SequentialGroup rowSequentialGroup = layout.createSequentialGroup();
+		
+		// Iterate over the ArrayList to create horizontal layout groupings
+		for (int i = 0; (i < medallions.size()) && (i < 4); i++) {
+			
+			ParallelGroup columnParallelGroup = layout.createParallelGroup(Alignment.CENTER);
+			
+			for (int j = i; j < medallions.size(); j=j+4) {
+				
+				MedallionCombo currentMedallionCombo = medallions.get(j);
+				
+				ParallelGroup medallionParallelGroup = layout.createParallelGroup(Alignment.CENTER);
+				medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionTextArea());
+				medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionButton());
+				
+				columnParallelGroup.addGroup(medallionParallelGroup);
+			}
+			
+			rowSequentialGroup.addGroup(columnParallelGroup);
+			rowSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, 20, 40);
+		}
+		
+		layout.setHorizontalGroup(rowSequentialGroup);
+		
+		SequentialGroup columnSequentialGroup = layout.createSequentialGroup();
+		
+		// Iterate over the ArrayList to create vertical layout groupings
+		for (int i = 0; i < medallions.size(); i=i+4) {
+			
+			ParallelGroup rowParallelGroup = layout.createParallelGroup(Alignment.CENTER);
+			
+			for (int j = i; (j < i + 4) && (j < medallions.size()); j++) {
+				
+				MedallionCombo currentMedallionCombo = medallions.get(j);
+				
+				SequentialGroup medallionSequentialGroup = layout.createSequentialGroup();
+				medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionTextArea());
+				medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionButton());
+				
+				rowParallelGroup.addGroup(medallionSequentialGroup);
+			}
+			
+			columnSequentialGroup.addGroup(rowParallelGroup);
+			columnSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 60, 60);
+		}
+		
+		layout.setVerticalGroup(columnSequentialGroup);
+		
+		return layout;
+	}
+	
+	private void saveProgram() {
+		
+	}
+	
+	
+
+	// Implement Overridden functions
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if (e.getSource() == saveMenuItem) {
-			
+			saveProgram();
 		}
 		else if (e.getSource() == preferencesMenuItem) {
 			
 		}
-		else if (e.getSource() == saveMenuItem) {
+		else if (e.getSource() == editMedalListMenuItem) {
 			
 		}
 	}
