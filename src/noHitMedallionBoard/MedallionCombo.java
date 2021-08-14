@@ -17,6 +17,7 @@ public class MedallionCombo implements ActionListener {
 
 	private JButton medallionButton;
 	private JTextArea medallionText;
+	private float shadowLengthMultiplier = 0.02f;
 	
 	// Boolean to keep track of whether the image is gray scale (GS) or not.
 	private Boolean medallionBGS = true;
@@ -71,10 +72,10 @@ public class MedallionCombo implements ActionListener {
 		medallionGSBImageWShadow = addShadowToImage(medallionGSBImage, medallionShadowImage);
 		
 		/*
-		 * Remove this later. Testing CreateImageShadow.createBlackWhiteImage
+		 * Remove this later. Testing CreateImageShadow
 		 */
-		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, 0.01f);
-		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, 0.01f);
+		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, shadowLengthMultiplier);
+		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, shadowLengthMultiplier);
 
 		medallionBImage = iBShadow.getShadowBitSetImage();
 		medallionGSBImage = iGSBShadow.getShadowBitSetImage();
@@ -82,9 +83,9 @@ public class MedallionCombo implements ActionListener {
 		 * 
 		 */
 		
-		getMedallionButton().setMinimumSize(new Dimension(medallionGSBImage.getWidth(), medallionGSBImage.getHeight()));
-		getMedallionButton().setPreferredSize(new Dimension(medallionGSBImage.getWidth(), medallionGSBImage.getHeight()));
-		getMedallionButton().setMaximumSize(new Dimension(medallionGSBImage.getWidth(), medallionGSBImage.getHeight()));
+		getMedallionButton().setMinimumSize(new Dimension(100, 100));
+		getMedallionButton().setPreferredSize(new Dimension(100, 100));
+		getMedallionButton().setMaximumSize(new Dimension(100, 100));
 		
 		getMedallionTextArea().setMinimumSize(new Dimension(150, 30));
 		getMedallionTextArea().setPreferredSize(new Dimension(150, 40));
@@ -235,6 +236,7 @@ public class MedallionCombo implements ActionListener {
 		return;
 	}
 
+	// Implement getter and setter functions
 	public JButton getMedallionButton() {
 		return medallionButton;
 	}

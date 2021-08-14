@@ -13,6 +13,7 @@ public class CreateImageShadow {
 	private BufferedImage blackWhiteImg;
 	private BufferedImage imgOutline;
 	private ArrayList<BitSet> shadowBitSet;
+	private int shadowLength;
 	
 	public CreateImageShadow(BufferedImage img, float shadowLengthMultiplier) {
 		
@@ -129,34 +130,30 @@ public class CreateImageShadow {
 		int w = imgoutline.getWidth();
 		int h = imgoutline.getHeight();
 		
-		int shadowlength = (int)(Math.sqrt(Math.multiplyExact(w, w) + Math.multiplyExact(h, h))*shadowmult);
+		shadowLength = (int)(Math.sqrt(Math.multiplyExact(w, w) + Math.multiplyExact(h, h))*shadowmult);
 		
 		for (int i = 0; i < w; i++) {
 			
 			shadowbitset.add(new BitSet(h));
 		}
-		
-		System.out.println("Entering createShadowBitset loops.");
-		
+				
 		for (int i = 0; i < w; i++) {
 			
 			for (int j = 0; j < h; j++) {
 				
 				if (imgoutline.getRGB(i, j) == rgbBlack) {
-					
-					System.out.println("Found outline.");
-					
-					for (int k = i - shadowlength; k < i + shadowlength + 1; k++) {
+										
+					for (int k = i - shadowLength; k < i + shadowLength + 1; k++) {
 						
-						for (int m = j - shadowlength; m < j + shadowlength + 1; j++) {
+						for (int m = j + Math.abs(i - k) - shadowLength; m < j - Math.abs(i - k) + shadowLength + 1; m++) {
 							
-							if (Math.abs(i - k) + Math.abs(j - m) > shadowlength) {
+							if (Math.abs(i - k) + Math.abs(j - m) > shadowLength) {
 								continue;
 							}
-							else if ((k < 0) || (k > w)) {
+							else if ((k < 0) || (k > w - 1)) {
 								continue;
 							}
-							else if ((j < 0) || (j > h)) {
+							else if ((m < 0) || (m > h - 1)) {
 								continue;
 							}
 							
@@ -166,9 +163,7 @@ public class CreateImageShadow {
 				}
 			}
 		}
-		
-		System.out.println("Exiting createShadowBitset loops.");
-		
+				
 		return shadowbitset;
 	}
 

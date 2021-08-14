@@ -2,6 +2,8 @@ package noHitMedallionBoard;
 
 import java.awt.*;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
@@ -15,7 +17,14 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class NoHitMedallionBoard {
+public class NoHitMedallionBoard implements ActionListener {
+
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem saveMenuItem;
+	private JMenuItem preferencesMenuItem;
+	private JMenu editMenu;
+	private JMenuItem editMedalListMenuItem;
 
 	private JFrame frame;
 	private JPanel panel;
@@ -27,6 +36,25 @@ public class NoHitMedallionBoard {
 		panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		
+		// Menu setup
+		menuBar = new JMenuBar();
+		
+		fileMenu = new JMenu("File");
+		editMenu = new JMenu("Edit");
+		
+		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
+		
+		saveMenuItem = new JMenuItem("Save...");
+		preferencesMenuItem = new JMenuItem("Preferences");
+		editMedalListMenuItem = new JMenuItem("Medal List");
+		
+		fileMenu.add(saveMenuItem);
+		fileMenu.add(preferencesMenuItem);
+		
+		editMenu.add(editMedalListMenuItem);
+		
+		//
 		medallionArrayList = new ArrayList<MedallionCombo>(); 
 		
 		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
@@ -97,6 +125,7 @@ public class NoHitMedallionBoard {
 		panel.setLayout(layout);
 		panel.setPreferredSize(new Dimension(730, 440));
 		
+		frame.setJMenuBar(menuBar);
 		frame.add(panel, BorderLayout.CENTER);
 		frame.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent componentEvent) {
@@ -120,6 +149,20 @@ public class NoHitMedallionBoard {
 		
 		new NoHitMedallionBoard();
 
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+		if (e.getSource() == saveMenuItem) {
+			
+		}
+		else if (e.getSource() == preferencesMenuItem) {
+			
+		}
+		else if (e.getSource() == saveMenuItem) {
+			
+		}
 	}
 
 }
