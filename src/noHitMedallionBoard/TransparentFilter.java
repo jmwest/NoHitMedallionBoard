@@ -41,15 +41,12 @@ class TransparentFilter extends RGBImageFilter {
             return a|(argb&TransparentFilter.rgbMask);
 		}
         else {
-        	/*
-        	if (a < 0x80<<TransparentFilter.aShift) {
-				a = 0x00<<TransparentFilter.aShift;
+        	
+        	if (a < Integer.parseInt("80", 16)<<TransparentFilter.aShift) {
+				a = Integer.parseInt("80", 16)<<TransparentFilter.aShift;
 			}
-        	else {
-				a = 0xff<<TransparentFilter.aShift;
-			}
-			*/
-            return a|000000;
+        	
+            return a|Integer.parseInt("A3B1C6", 16)&TransparentFilter.rgbMask;
         }
     }
 
