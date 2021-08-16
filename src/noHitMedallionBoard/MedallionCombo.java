@@ -9,14 +9,22 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 public class MedallionCombo implements ActionListener {
 
     final static int defaultButtonSize=100;
 	
 	private JButton medallionButton;
-	private JTextArea medallionText;
+	private JTextPane medallionText;
+	private JTextPane noHitTextPane;
+	
+	private Boolean includeMedallionText = true;
+	private Boolean includeNoHitText = true;
+	
 	private float shadowLengthMultiplier = 0.02f;
 	private int buttonSize = defaultButtonSize;
 	
@@ -34,53 +42,71 @@ public class MedallionCombo implements ActionListener {
 	
 	public MedallionCombo(String medStr, String imgSrcStr, BufferedImage backGroundImage, Point location) {
 		
-		medallionText = new JTextArea(medStr);
+		medallionText = new JTextPane();
 		setMedallionButton(new JButton());
+		noHitTextPane = new JTextPane();
 		
 		getMedallionButton().addActionListener(this);
-		getMedallionButton().setOpaque(false);
 		getMedallionButton().setBorderPainted(false);
+		getMedallionButton().setRolloverEnabled(false);
+		getMedallionButton().setContentAreaFilled(false);
+		getMedallionButton().setBorderPainted(false);
+		getMedallionButton().setFocusPainted(false);
 		
+		//
 		medallionText.setEditable(false);
-		medallionText.setLineWrap(true);
-		medallionText.setWrapStyleWord(true);
-				
+		
+		SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+		StyleConstants.setForeground(attributeSet, Color.white);
+		StyleConstants.setBackground(attributeSet, new Color(1.0f, 1.0f, 1.0f, 0.0f));		
+		medallionText.setCharacterAttributes(attributeSet, true);
+		medallionText.setText(medStr);
+		medallionText.setOpaque(false);
+		medallionText.setEditable(false);
+		
+		StyledDocument medallionTextdoc = medallionText.getStyledDocument();
+		SimpleAttributeSet center = new SimpleAttributeSet();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		medallionTextdoc.setParagraphAttributes(0, medallionTextdoc.getLength(), center, false);
+		
+		//
 		medallionButtonActionCommandStr = "change " + medStr + " button";
 		getMedallionButton().setActionCommand(medallionButtonActionCommandStr);
 		
 		// Handle image file
-		File medallionImageFile = new File(imgSrcStr);
-		
-		try {
-			System.out.println("Canonical path of target image: " + medallionImageFile.getCanonicalPath());
-            if (!medallionImageFile.exists()) {
-                System.out.println("file " + medallionImageFile + " does not exist");
-            }
-            medallionBImage = ImageIO.read(medallionImageFile);
-		} catch (Exception ex) {
-			System.out.println(ex);
-			ex.printStackTrace();
-		}
+		medallionBImage = openImageFile(imgSrcStr);
 
 		CreateImageShadow iShadow = new CreateImageShadow(medallionBImage, backGroundImage,
 														   location, shadowLengthMultiplier);
 		
 		medallionBImage = iShadow.getCompleteImage();
 		medallionGSBImage = iShadow.getCompleteShadowImage();
-		/*
-		 * 
-		 */
 		
 		getMedallionButton().setMinimumSize(new Dimension(buttonSize, buttonSize));
 		getMedallionButton().setPreferredSize(new Dimension(buttonSize, buttonSize));
 		getMedallionButton().setMaximumSize(new Dimension(buttonSize, buttonSize));
 		
-		getMedallionTextArea().setMinimumSize(new Dimension(150, 30));
-		getMedallionTextArea().setPreferredSize(new Dimension(150, 40));
-		getMedallionTextArea().setMaximumSize(new Dimension(150, 60));
+		getMedallionTextPane().setMinimumSize(new Dimension(150, 30));
+		getMedallionTextPane().setPreferredSize(new Dimension(150, 40));
+		getMedallionTextPane().setMaximumSize(new Dimension(150, 60));
 		
 		ImageIcon medallionIcon = getScaledIcon(medallionGSBImage, getMedallionButton());
 		getMedallionButton().setIcon(medallionIcon);
+		getMedallionButton().setPressedIcon(medallionIcon);
+		
+		//
+		attributeSet = new SimpleAttributeSet();
+		StyleConstants.setBold(attributeSet, true);
+		StyleConstants.setForeground(attributeSet, Color.white);
+		StyleConstants.setBackground(attributeSet, new Color(1.0f, 1.0f, 1.0f, 0.0f));		
+		noHitTextPane.setCharacterAttributes(attributeSet, true);
+		noHitTextPane.setText("No Hit");
+		noHitTextPane.setOpaque(false);
+		noHitTextPane.setEditable(false);
+		
+		StyledDocument noHitdoc = noHitTextPane.getStyledDocument();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		noHitdoc.setParagraphAttributes(0, noHitdoc.getLength(), center, false);
 	}
 	
 	// Public MedallionCombo functions
@@ -96,8 +122,29 @@ public class MedallionCombo implements ActionListener {
 	}
 	
 	// Private MedallionCombo functions
+	private BufferedImage openImageFile(String filename) {
+		
+		File imageFile = new File(filename);
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		try {
+			System.out.println("Canonical path of target image: " + imageFile.getCanonicalPath());
+            if (!imageFile.exists()) {
+                System.out.println("file " + imageFile + " does not exist");
+            }
+            image = ImageIO.read(imageFile);
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
+		
+		return image;
+	}
+	
 	private void changeButtonImage(JButton button, BufferedImage bimg) {
-		button.setIcon(getScaledIcon(bimg, button));
+		ImageIcon scldicon = getScaledIcon(bimg, button);
+		button.setIcon(scldicon);
+		button.setPressedIcon(scldicon);
 		
 		return;
 	}
@@ -163,12 +210,22 @@ public class MedallionCombo implements ActionListener {
 		return;
 	}
 	
-	public JTextArea getMedallionTextArea() {
+	public JTextPane getMedallionTextPane() {
 		return medallionText;
 	}
 
-	public void setMedallionTextArea(JTextArea medallionTextArea) {
-		this.medallionText = medallionTextArea;
+	public void setMedallionTextArea(JTextPane medallionTextPane) {
+		this.medallionText = medallionTextPane;
+		
+		return;
+	}
+	
+	public JTextPane getNoHitTextPane() {
+		return noHitTextPane;
+	}
+
+	public void setNoHitTextPane(JTextPane noHitTextPane) {
+		this.noHitTextPane = noHitTextPane;
 		
 		return;
 	}
@@ -179,6 +236,26 @@ public class MedallionCombo implements ActionListener {
 
 	public void setButtonSize(int buttonsize) {
 		this.buttonSize = buttonsize;
+		
+		return;
+	}
+	
+	public Boolean getIncludeMedallionText() {
+		return includeMedallionText;
+	}
+
+	public void setIncludeMedallionText(Boolean includeMedallionText) {
+		this.includeMedallionText = includeMedallionText;
+		
+		return;
+	}
+	
+	public Boolean getIncludeNoHitText() {
+		return includeNoHitText;
+	}
+
+	public void setIncludeNoHitText(Boolean includeNoHitText) {
+		this.includeNoHitText = includeNoHitText;
 		
 		return;
 	}

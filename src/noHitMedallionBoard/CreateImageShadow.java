@@ -3,12 +3,8 @@ package noHitMedallionBoard;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
-
-import javax.imageio.ImageIO;
 
 public class CreateImageShadow {
 	
@@ -43,24 +39,24 @@ public class CreateImageShadow {
 		shadowLength = (int)(Math.sqrt(Math.multiplyExact(w, w) + Math.multiplyExact(h, h))*shadowLengthMultiplier);
 		tintLength = shadowLength/2;
 		
-		//
+		// Create dark shadow
 		blackWhiteImg = createBlackWhiteImage(img, shadowLength);
 		imgOutline = createImageOutline(blackWhiteImg);
 		shadowBitSet = createShadowBitset(imgOutline, shadowLength);
 		shadowImg = createShadow(blackWhiteImg, backgroundImage, imgLocation, shadowBitSet);
 		
-		// Create 
+		// Create tinted border along shadow
 		blackWhiteShadowImg = createBlackWhiteImage(shadowImg, tintLength);
 		shadowImgOutline = createImageOutline(blackWhiteShadowImg);
 		shadowOutlineBitSet = createShadowBitset(shadowImgOutline, tintLength);
 		shadowOutlineImg = createShadow(blackWhiteShadowImg, backgroundImage, imgLocation, shadowOutlineBitSet);
 				
-		//
+		// Finalize the images
 		completeShadowImg = addShadowOutlineTint(shadowOutlineImg, blackWhiteShadowImg);
 		completeImg = addCompleteShadowToImg(img, completeShadowImg);
 	}
 
-	// Public Functions
+	// Public Getter/Setter Functions
 	public BufferedImage getBlackWhiteImage() {
 		return blackWhiteImg;
 	}
@@ -318,18 +314,12 @@ public class CreateImageShadow {
 		
 		int shadowW = shadowimg.getWidth();
 		int shadowH = shadowimg.getHeight();
-		
-		System.out.println("Shadow Size: " + String.valueOf(shadowW) + ", " + String.valueOf(shadowH));
-		
+				
 		int imgW = img.getWidth();
 		int imgH = img.getHeight();
-		
-		System.out.println("Img Size: " + String.valueOf(imgW) + ", " + String.valueOf(imgH));
-		
+				
 		int imgBorder = shadowLength + tintLength;
-		
-		System.out.println("Img Border: " + String.valueOf(imgBorder));
-		
+				
 		BufferedImage imgwithshadow = new BufferedImage(shadowW, shadowH, BufferedImage.TYPE_4BYTE_ABGR);
 		
 		for (int i = 0; i < shadowW; i++) {

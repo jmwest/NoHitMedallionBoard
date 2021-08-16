@@ -33,7 +33,9 @@ public class NoHitMedallionBoard implements ActionListener {
 	private JMenuItem preferencesMenuItem;
 	private JMenu editMenu;
 	private JMenuItem editMedalListMenuItem;
-
+	
+	private EditMedalListMenuFrame editMedalListMenuFrame;
+	
 	private JFrame frame;
 	private JPanel badgePanel;
 	private JPanel casePanel;
@@ -47,16 +49,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		
 		frame = new JFrame();
 		badgePanel = new JPanel();
-		casePanel = new JPanel() {
-		      /**
-			 * 
-			 */
-			private static final long serialVersionUID = -1966498432290649222L;
-
-			public boolean isOptimizedDrawingEnabled() {
-		          return false;
-		      }
-		};
+		casePanel = new JPanel();
 		
 		Insets insets = frame.getInsets();
 		
@@ -64,51 +57,36 @@ public class NoHitMedallionBoard implements ActionListener {
 		menuBar = new JMenuBar();
 		
 		fileMenu = new JMenu("File");
-		editMenu = new JMenu("Edit");
+		editMenu = new JMenu("Edit"); 
 		
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
 		
+		// Create MenuItems and handle them.
 		saveMenuItem = new JMenuItem("Save...");
-		preferencesMenuItem = new JMenuItem("Preferences");
-		editMedalListMenuItem = new JMenuItem("Medal List");
+		saveMenuItem.addActionListener(this);
 		
+		preferencesMenuItem = new JMenuItem("Preferences");
+		preferencesMenuItem.addActionListener(this);
+
+		editMedalListMenuItem = new JMenuItem("Medal List");
+		editMedalListMenuItem.addActionListener(this);
+		
+		//
 		fileMenu.add(saveMenuItem);
 		fileMenu.add(preferencesMenuItem);
 		
 		editMenu.add(editMedalListMenuItem);
 		
 		// Handle caseLabel image file
-		File caseLabelImageFile = new File("/Volumes/Seagate 2 TB Storage/Medal_Case_Background_Transparent.png");
-		
-		try {
-			System.out.println("Canonical path of target image: " + caseLabelImageFile.getCanonicalPath());
-            if (!caseLabelImageFile.exists()) {
-                System.out.println("file " + caseLabelImageFile + " does not exist");
-            }
-            caseLabelImage = ImageIO.read(caseLabelImageFile);
-		} catch (Exception ex) {
-			System.out.println(ex);
-			ex.printStackTrace();
-		}
+		caseLabelImage = openImageFile("/Volumes/Seagate 2 TB Storage/Medal_Case_Background_Transparent.png");
 		
 		// Handle caseLabel image file
-		File backgroundLabelImageFile = new File("/Volumes/Seagate 2 TB Storage/Medal_Case_Inset_With_Gradient.png");
-		
-		try {
-			System.out.println("Canonical path of target image: " + backgroundLabelImageFile.getCanonicalPath());
-            if (!backgroundLabelImageFile.exists()) {
-                System.out.println("file " + backgroundLabelImageFile + " does not exist");
-            }
-            backgroundLabelImage = ImageIO.read(backgroundLabelImageFile);
-		} catch (Exception ex) {
-			System.out.println(ex);
-			ex.printStackTrace();
-		}
+		backgroundLabelImage = openImageFile("/Volumes/Seagate 2 TB Storage/Medal_Case_Inset_With_Gradient.png");
 		
 		// 
 		badgePanelDimension.width = 150*4 + 20*3;
-		badgePanelDimension.height = 100*2 + 50*2+ 10*2 + 60;
+		badgePanelDimension.height = 100*2 + 50*2 + 10*2 + 60;
 		
 		//
 		ArrayList<Point> medAL = calculateMedallionLocations(6, badgePanelDimension.width, badgePanelDimension.height);
@@ -189,6 +167,12 @@ public class NoHitMedallionBoard implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 		
+		// Set up EditMedalListMenuFrame
+		editMedalListMenuFrame = new EditMedalListMenuFrame(medallionArrayList);
+		editMedalListMenuFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		editMedalListMenuFrame.setTitle("Edit Medal List");
+		editMedalListMenuFrame.pack();
+		editMedalListMenuFrame.setVisible(false);
 	}
 	
 	public static void main(String[] args) {
@@ -218,8 +202,13 @@ public class NoHitMedallionBoard implements ActionListener {
 				MedallionCombo currentMedallionCombo = medallions.get(j);
 				
 				ParallelGroup medallionParallelGroup = layout.createParallelGroup(Alignment.CENTER);
-				medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionTextArea());
+				if (currentMedallionCombo.getIncludeMedallionText()) {
+					medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionTextPane());
+				}
 				medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionButton());
+				if (currentMedallionCombo.getIncludeNoHitText()) {
+					medallionParallelGroup.addComponent(currentMedallionCombo.getNoHitTextPane());
+				}
 				
 				columnParallelGroup.addGroup(medallionParallelGroup);
 			}
@@ -242,9 +231,15 @@ public class NoHitMedallionBoard implements ActionListener {
 				MedallionCombo currentMedallionCombo = medallions.get(j);
 				
 				SequentialGroup medallionSequentialGroup = layout.createSequentialGroup();
-				medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionTextArea());
-				medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
+				if (currentMedallionCombo.getIncludeMedallionText()) {
+					medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionTextPane());
+					medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
+				}
 				medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionButton());
+				if (currentMedallionCombo.getIncludeNoHitText()) {
+					medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
+					medallionSequentialGroup.addComponent(currentMedallionCombo.getNoHitTextPane());
+				}
 				
 				rowParallelGroup.addGroup(medallionSequentialGroup);
 			}
@@ -326,6 +321,25 @@ public class NoHitMedallionBoard implements ActionListener {
 	}
 	
 	// Private Image functions
+	private BufferedImage openImageFile(String filename) {
+		
+		File imageFile = new File(filename);
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		try {
+			System.out.println("Canonical path of target image: " + imageFile.getCanonicalPath());
+            if (!imageFile.exists()) {
+                System.out.println("file " + imageFile + " does not exist");
+            }
+            image = ImageIO.read(imageFile);
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
+		
+		return image;
+	}
+	
 	private void changeLabelImage(JLabel label, BufferedImage bimg) {
 		label.setIcon(getScaledLabelIcon(bimg, label));
 		
@@ -380,7 +394,10 @@ public class NoHitMedallionBoard implements ActionListener {
 			
 		}
 		else if (e.getSource() == editMedalListMenuItem) {
-			
+			System.out.println("Action Listener is working.");
+
+			editMedalListMenuFrame.setAlwaysOnTop(true);
+			editMedalListMenuFrame.setVisible(true);
 		}
 	}
 
