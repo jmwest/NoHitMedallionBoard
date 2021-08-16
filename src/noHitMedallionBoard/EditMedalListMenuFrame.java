@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -24,23 +25,64 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -1061822005019075338L;
 
 	private JPanel editMLMFPanel;
-	private ArrayList<JCheckBox> medalCheckBoxLArrayList;
+	private JTextArea medalTextCheckBoxHeader;
+	private JTextArea medalTextHeader;
+	private JTextArea medalNoHitCheckBoxHeader;
+	private JTextArea medalNoHitHeader;
+	private JTextArea changeMedalHeader;
+	private ArrayList<JCheckBox> medalTextCheckBoxLArrayList;
 	private ArrayList<JTextArea> medalTextArrayList;
+	private ArrayList<JCheckBox> medalNoHitCheckBoxArrayList;
+	private ArrayList<JTextArea> medalNoHitArrayList;
+	private ArrayList<JButton> changeMedalButtonArrayList;
+	private JButton addNewMedalButton;
 	private JButton saveButton;
 	
 	private JButton importImageButton;
 	
 	public EditMedalListMenuFrame(ArrayList<MedallionCombo> medallionCombos) {
 		
-		medalCheckBoxLArrayList = createMedalCheckBoxs(medallionCombos);
-		medalTextArrayList = createMedalTextAreas(medallionCombos);
+		medalTextCheckBoxHeader = new JTextArea("Include Title Text");
+		medalTextHeader = new JTextArea("Edit Title Text");
+		medalNoHitCheckBoxHeader = new JTextArea("Include Challenge Text");
+		medalNoHitHeader = new JTextArea("Edit Challenge Text");
+		changeMedalHeader = new JTextArea("Change Medal Image");
+		
+		medalTextCheckBoxHeader.setEditable(false);
+		medalTextCheckBoxHeader.setLineWrap(false);
+		
+		medalTextHeader.setEditable(false);
+		medalTextHeader.setLineWrap(false);
+		
+		medalNoHitCheckBoxHeader.setEditable(false);
+		medalNoHitCheckBoxHeader.setLineWrap(false);
+		
+		medalNoHitHeader.setEditable(false);
+		medalNoHitHeader.setLineWrap(false);
+		
+		changeMedalHeader.setEditable(false);
+		changeMedalHeader.setLineWrap(false);
+		
+		setJTextAreaDimensions(medalTextCheckBoxHeader, 100, 100, 150);
+		setJTextAreaDimensions(medalTextHeader, 100, 100, 150);
+		setJTextAreaDimensions(medalNoHitCheckBoxHeader, 100, 100, 150);
+		setJTextAreaDimensions(medalNoHitHeader, 100, 100, 150);
+		setJTextAreaDimensions(changeMedalHeader, 100, 100, 150);
+
+		
+		medalTextArrayList = new ArrayList<JTextArea>();
+		medalNoHitArrayList = new ArrayList<JTextArea>();
+		
+		medalTextCheckBoxLArrayList = createMedalCheckBoxs(medallionCombos);
+		createMedalTextAreas(medallionCombos);
+		medalNoHitCheckBoxArrayList = createMedalCheckBoxs(medallionCombos);
 		
 		editMLMFPanel = new JPanel();
 		editMLMFPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		editMLMFPanel.setOpaque(false);
-		editMLMFPanel.setLayout(createBadgeGroupLayout(editMLMFPanel, medalCheckBoxLArrayList, medalTextArrayList));
+		editMLMFPanel.setLayout(createBadgeGroupLayout(editMLMFPanel));
 		
-		setPanelDimensions(editMLMFPanel, new Dimension(650, 30*(medallionCombos.size()+ 1)));
+		setPanelDimensions(editMLMFPanel, new Dimension(800, 30*(medallionCombos.size()+ 1)));
 		
 		this.add(editMLMFPanel);
 	}
@@ -65,28 +107,32 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		return checkBoxs;
 	}
 	
-	private ArrayList<JTextArea> createMedalTextAreas(ArrayList<MedallionCombo> medallionCombos) {
-		
-		ArrayList<JTextArea> textAreas = new ArrayList<JTextArea>();
-		
+	private void createMedalTextAreas(ArrayList<MedallionCombo> medallionCombos) {
+				
 		for (int i = 0; i < medallionCombos.size(); i++) {
 			
 			MedallionCombo currentMedallionCombo = medallionCombos.get(i);
-			JTextArea newTextArea = new JTextArea(currentMedallionCombo.getMedallionTextPane().getText());
+			JTextArea medalTextArea = new JTextArea(currentMedallionCombo.getMedallionTextPane().getText());
 			
-			newTextArea.setEditable(true);
-			newTextArea.setLineWrap(false);
-			newTextArea.setMinimumSize(new Dimension(150, 20));
-			newTextArea.setPreferredSize(new Dimension(300, 20));
-			newTextArea.setMaximumSize(new Dimension(600, 20));
+			medalTextArea.setEditable(true);
+			medalTextArea.setLineWrap(false);
+			setJTextAreaDimensions(medalTextArea, 150, 300, 600);
 			
-			textAreas.add(newTextArea);
+			medalTextArrayList.add(medalTextArea);
+			
+			JTextArea noHitTextArea = new JTextArea(currentMedallionCombo.getNoHitTextPane().getText());
+			
+			noHitTextArea.setEditable(true);
+			noHitTextArea.setLineWrap(false);
+			setJTextAreaDimensions(noHitTextArea, 100, 150, 300);
+			
+			medalNoHitArrayList.add(noHitTextArea);
 		}
 		
-		return textAreas;
+		return;
 	}
 	
-	private GroupLayout createBadgeGroupLayout(JPanel panel, ArrayList<JCheckBox> checkBoxs, ArrayList<JTextArea> textAreas) {
+	private GroupLayout createBadgeGroupLayout(JPanel panel) {
 		
 		GroupLayout layout = new GroupLayout(panel);
 
@@ -133,6 +179,15 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		panel.setMinimumSize(dim);
 		panel.setPreferredSize(dim);
 		panel.setMaximumSize(dim);
+		
+		return;
+	}
+	
+	private void setJTextAreaDimensions(JTextArea textArea, int minwidth, int prefwidth, int maxwidth) {
+		
+		textArea.setMinimumSize(new Dimension(minwidth, 20));
+		textArea.setPreferredSize(new Dimension(prefwidth, 20));
+		textArea.setMaximumSize(new Dimension(maxwidth, 20));
 		
 		return;
 	}
