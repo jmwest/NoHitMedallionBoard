@@ -15,9 +15,12 @@ import javax.swing.JTextArea;
 
 public class MedallionCombo implements ActionListener {
 
+    final static int defaultButtonSize=100;
+	
 	private JButton medallionButton;
 	private JTextArea medallionText;
 	private float shadowLengthMultiplier = 0.02f;
+	private int buttonSize = defaultButtonSize;
 	
 	// Boolean to keep track of whether the image is gray scale (GS) or not.
 	private Boolean medallionBGS = true;
@@ -34,7 +37,7 @@ public class MedallionCombo implements ActionListener {
 	private BufferedImage medallionBImageWShadow;
 	private BufferedImage medallionShadowImage;
 	
-	public MedallionCombo(String medStr, String imgSrcStr) {
+	public MedallionCombo(String medStr, String imgSrcStr, BufferedImage backGroundImage, Point location) {
 		
 		medallionText = new JTextArea(medStr);
 		setMedallionButton(new JButton());
@@ -74,18 +77,20 @@ public class MedallionCombo implements ActionListener {
 		/*
 		 * Remove this later. Testing CreateImageShadow
 		 */
-		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, shadowLengthMultiplier);
-		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, shadowLengthMultiplier);
+		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, backGroundImage,
+														   location, shadowLengthMultiplier);
+		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, backGroundImage,
+															 location, shadowLengthMultiplier);
 
-		medallionBImage = iBShadow.getShadowBitSetImage();
-		medallionGSBImage = iGSBShadow.getShadowBitSetImage();
+		medallionBImage = iBShadow.getCompleteShadowImage();
+		medallionGSBImage = iGSBShadow.getCompleteShadowImage();
 		/*
 		 * 
 		 */
 		
-		getMedallionButton().setMinimumSize(new Dimension(100, 100));
-		getMedallionButton().setPreferredSize(new Dimension(100, 100));
-		getMedallionButton().setMaximumSize(new Dimension(100, 100));
+		getMedallionButton().setMinimumSize(new Dimension(buttonSize, buttonSize));
+		getMedallionButton().setPreferredSize(new Dimension(buttonSize, buttonSize));
+		getMedallionButton().setMaximumSize(new Dimension(buttonSize, buttonSize));
 		
 		getMedallionTextArea().setMinimumSize(new Dimension(150, 30));
 		getMedallionTextArea().setPreferredSize(new Dimension(150, 40));
@@ -253,6 +258,16 @@ public class MedallionCombo implements ActionListener {
 
 	public void setMedallionTextArea(JTextArea medallionTextArea) {
 		this.medallionText = medallionTextArea;
+		
+		return;
+	}
+	
+	public int getButtonSize() {
+		return buttonSize;
+	}
+
+	public void setButtonSize(int buttonsize) {
+		this.buttonSize = buttonsize;
 		
 		return;
 	}

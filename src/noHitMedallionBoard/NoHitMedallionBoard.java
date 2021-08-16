@@ -22,6 +22,10 @@ public class NoHitMedallionBoard implements ActionListener {
     final static int caseLeft=70;
     final static int caseRight=70;
     final static int caseBottom=90;
+    final static int caseAvailableWidth=485;
+    final static int caseAvailableHeight=274;
+    
+    private Dimension badgePanelDimension = new Dimension();
 
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
@@ -34,7 +38,9 @@ public class NoHitMedallionBoard implements ActionListener {
 	private JPanel badgePanel;
 	private JPanel casePanel;
 	private JLabel caseLabel;
+	private JLabel backgroundLabel;
 	private BufferedImage caseLabelImage;
+	private BufferedImage backgroundLabelImage;
 	private ArrayList<MedallionCombo> medallionArrayList;
 
 	public NoHitMedallionBoard() {
@@ -51,7 +57,6 @@ public class NoHitMedallionBoard implements ActionListener {
 		          return false;
 		      }
 		};
-		caseLabel = new JLabel();
 		
 		Insets insets = frame.getInsets();
 		
@@ -73,32 +78,6 @@ public class NoHitMedallionBoard implements ActionListener {
 		
 		editMenu.add(editMedalListMenuItem);
 		
-		//
-		medallionArrayList = new ArrayList<MedallionCombo>(); 
-		
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
-								"/Volumes/Seagate 2 TB Storage/Ocarina_of_Time.png"));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
-								"/Volumes/Seagate 2 TB Storage/Majoras_Mask.png"));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
-								"/Volumes/Seagate 2 TB Storage/Wind_Waker.png"));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
-								"/Volumes/Seagate 2 TB Storage/Fusedshadow.png"));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
-								"/Volumes/Seagate 2 TB Storage/SS_Zelda.png"));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
-								"/Volumes/Seagate 2 TB Storage/Hestus_Gift.png"));
-		
-		// 
-		int badgePanelWidth = 150*4 + 20*3;
-		int badgePanelHeight = 100*2 + 10*2 + 60;
-		
-		badgePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		badgePanel.setLayout(createBadgeGroupLayout(badgePanel, medallionArrayList));
-		badgePanel.setPreferredSize(new Dimension(badgePanelWidth, badgePanelHeight));
-		badgePanel.setAlignmentX(0.5f);
-		badgePanel.setAlignmentY(0.5f);
-		
 		// Handle caseLabel image file
 		File caseLabelImageFile = new File("/Volumes/Seagate 2 TB Storage/Medal_Case_Background_Transparent.png");
 		
@@ -113,8 +92,57 @@ public class NoHitMedallionBoard implements ActionListener {
 			ex.printStackTrace();
 		}
 		
-		int caseLabelWidth = caseLeft + 10 + badgePanelWidth + 10 + caseRight;
-		int caseLabelHeight = caseTop + 200 + 10 + badgePanelHeight + 10 + caseBottom;
+		// Handle caseLabel image file
+		File backgroundLabelImageFile = new File("/Volumes/Seagate 2 TB Storage/Medal_Case_Inset_With_Gradient.png");
+		
+		try {
+			System.out.println("Canonical path of target image: " + backgroundLabelImageFile.getCanonicalPath());
+            if (!backgroundLabelImageFile.exists()) {
+                System.out.println("file " + backgroundLabelImageFile + " does not exist");
+            }
+            backgroundLabelImage = ImageIO.read(backgroundLabelImageFile);
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
+		
+		// 
+		badgePanelDimension.width = 150*4 + 20*3;
+		badgePanelDimension.height = 100*2 + 50*2+ 10*2 + 60;
+		
+		//
+		ArrayList<Point> medAL = calculateMedallionLocations(6, badgePanelDimension.width, badgePanelDimension.height);
+		
+		//
+		medallionArrayList = new ArrayList<MedallionCombo>(); 
+		
+		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
+								"/Volumes/Seagate 2 TB Storage/Ocarina_of_Time.png", backgroundLabelImage, medAL.get(0)));
+		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
+								"/Volumes/Seagate 2 TB Storage/Majoras_Mask.png", backgroundLabelImage, medAL.get(1)));
+		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
+								"/Volumes/Seagate 2 TB Storage/Wind_Waker.png", backgroundLabelImage, medAL.get(2)));
+		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
+								"/Volumes/Seagate 2 TB Storage/Fusedshadow.png", backgroundLabelImage, medAL.get(3)));
+		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
+								"/Volumes/Seagate 2 TB Storage/SS_Zelda.png", backgroundLabelImage, medAL.get(4)));
+		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
+								"/Volumes/Seagate 2 TB Storage/Hestus_Gift.png", backgroundLabelImage, medAL.get(5)));
+		
+		//
+		badgePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		badgePanel.setOpaque(false);
+		badgePanel.setLayout(createBadgeGroupLayout(badgePanel, medallionArrayList));
+		
+		setPanelDimensions(badgePanel, badgePanelDimension);
+		
+		badgePanel.setAlignmentX(0.5f);
+		badgePanel.setAlignmentY(0.49f);
+		
+		//
+		float caseRatioMult = calculateCaseRatio(badgePanelDimension);
+		int caseLabelWidth = (int)((caseLeft + caseAvailableWidth + caseRight) * caseRatioMult);
+		int caseLabelHeight = (int)((caseTop + caseAvailableHeight + caseBottom) * caseRatioMult);
 		
 		caseLabel = new JLabel(new ImageIcon(caseLabelImage));
 		caseLabel.setOpaque(false);
@@ -123,6 +151,14 @@ public class NoHitMedallionBoard implements ActionListener {
 		caseLabel.setMaximumSize(new Dimension(caseLabelWidth, caseLabelHeight));
 		caseLabel.setAlignmentX(0.5f);
 		caseLabel.setAlignmentY(0.5f);
+				
+		backgroundLabel = new JLabel(getScaledLabelIcon(backgroundLabelImage, caseLabelWidth, caseLabelHeight));
+		backgroundLabel.setOpaque(false);
+		backgroundLabel.setMinimumSize(new Dimension(caseLabelWidth, caseLabelHeight));
+		backgroundLabel.setPreferredSize(new Dimension(caseLabelWidth, caseLabelHeight));
+		backgroundLabel.setMaximumSize(new Dimension(caseLabelWidth, caseLabelHeight));
+		backgroundLabel.setAlignmentX(0.5f);
+		backgroundLabel.setAlignmentY(0.5f);
 		
 		int casePanelWidth = insets.left + 10 + caseLabelWidth + 10 + insets.right;
 		int casePanelHeight = insets.top + 10 + caseLabelHeight + 10 + insets.bottom;
@@ -132,6 +168,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		casePanel.setPreferredSize(new Dimension(casePanelWidth, casePanelHeight));
 		casePanel.add(caseLabel);
 		casePanel.add(badgePanel);
+		casePanel.add(backgroundLabel);
 		
 		frame.setJMenuBar(menuBar);
 		frame.add(casePanel, BorderLayout.CENTER);
@@ -166,8 +203,8 @@ public class NoHitMedallionBoard implements ActionListener {
 		
 		GroupLayout layout = new GroupLayout(panel);
 
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
+		layout.setAutoCreateGaps(false);
+		layout.setAutoCreateContainerGaps(false);
 		
 		SequentialGroup rowSequentialGroup = layout.createSequentialGroup();
 		
@@ -232,44 +269,105 @@ public class NoHitMedallionBoard implements ActionListener {
 		return layout;
 	}
 	
+	private float calculateCaseRatio(Dimension inlayDimension) {
+		
+		float caseRatio;
+		float ratioX;
+		float ratioY;
+		
+		ratioX = ((float) (inlayDimension.width)) / ((float) (caseAvailableWidth));
+		ratioY = ((float) (inlayDimension.height)) / ((float) (caseAvailableHeight));
+		
+		if (ratioX > ratioY) {
+			caseRatio = ratioX;
+		}
+		else {
+			caseRatio = ratioY;
+		}
+		
+		return caseRatio;
+	}
+	
+	private void setPanelDimensions(JPanel panel, Dimension dim) {
+		
+		panel.setMinimumSize(dim);
+		panel.setPreferredSize(dim);
+		panel.setMaximumSize(dim);
+		
+		return;
+	}
+	
+	private ArrayList<Point> calculateMedallionLocations(int arraySize, int panelWidth, int panelHeight) {
+		
+		ArrayList<Point> locationAL = new ArrayList<Point>();
+		
+		int array_rows = 0;
+		
+		if (arraySize != 0) {
+			array_rows = 1 + (arraySize / 4);
+		}
+		
+		for (int i = 0; i < arraySize; i++) {
+			
+			int medallionrow = 1 + (i / 4);
+			int medallioncol = 1 + Math.floorMod(i, 4);
+			
+			int pointy = ((medallionrow * panelHeight) / (2 * array_rows));
+			int pointx = (medallioncol * panelWidth) / 8;
+			
+			locationAL.add(new Point(pointx, pointy));
+		}
+		
+		return locationAL;
+	}
+	
 	private void saveProgram() {
 		
 	}
 	
 	// Private Image functions
-		private void changeLabelImage(JLabel label, BufferedImage bimg) {
-			label.setIcon(getScaledLabelIcon(bimg, label));
-			
-			return;
+	private void changeLabelImage(JLabel label, BufferedImage bimg) {
+		label.setIcon(getScaledLabelIcon(bimg, label));
+		
+		return;
+	}
+	
+	private ImageIcon getScaledLabelIcon(BufferedImage srcImg, JLabel label) {
+		
+		Dimension d = label.getSize();
+		BufferedImage scldImg = getScaledImage(srcImg, d.width, d.height);
+		
+		ImageIcon icon = new ImageIcon(scldImg);
+		
+		return icon;
+	}
+	
+	private ImageIcon getScaledLabelIcon(BufferedImage srcImg, int width, int height) {
+		
+		BufferedImage scldImg = getScaledImage(srcImg, width, height);
+		
+		ImageIcon icon = new ImageIcon(scldImg);
+		
+		return icon;
+	}
+	
+	private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h) {
+		
+		if (w == 0) {
+			w = 100;
 		}
 		
-		private ImageIcon getScaledLabelIcon(BufferedImage srcImg, JLabel label) {
-			
-			Dimension d = label.getSize();
-			BufferedImage scldImg = getScaledImage(srcImg, d.width, d.height);
-			
-			ImageIcon icon = new ImageIcon(scldImg);
-			
-			return icon;
+		if (h == 0) {
+			h = 100;
 		}
 		
-		private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h) {
-			
-			if (w == 0) {
-				w = 100;
-			}
-			
-			if (h == 0) {
-				h = 100;
-			}
-			
-			BufferedImage newImg = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
-			Graphics g = newImg.createGraphics();
-			g.drawImage(srcImg, 0, 0, w, h, null);
-			g.dispose();
-			
-			return newImg;
-		}
+		BufferedImage newImg = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics g = newImg.createGraphics();
+		g.drawImage(srcImg, 0, 0, w, h, null);
+		g.dispose();
+		
+		return newImg;
+	}
 
 	// Implement Overridden functions
 	@Override
