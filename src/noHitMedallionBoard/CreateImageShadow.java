@@ -1,11 +1,14 @@
 package noHitMedallionBoard;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
+
+import javax.imageio.ImageIO;
 
 public class CreateImageShadow {
 	
@@ -17,10 +20,19 @@ public class CreateImageShadow {
 	private BufferedImage imgOutline;
 	private ArrayList<BitSet> shadowBitSet;
 	private int shadowLength;
+	private int tintLength;
 	private BufferedImage shadowImg;
+	private BufferedImage blackWhiteShadowImg;
+	private BufferedImage shadowImgOutline;
+	private ArrayList<BitSet> shadowOutlineBitSet;
+	private BufferedImage shadowOutlineImg;
+	
 	private BufferedImage completeShadowImg;
+	private BufferedImage completeImg;
 	
 	private int bgColor = 0;
+	private int shadowColor = 0;
+	private int tintColor = 0;
 	
 	public CreateImageShadow(BufferedImage img, BufferedImage backgroundImage,
 							 Point imgLocation, float shadowLengthMultiplier) {
@@ -29,13 +41,23 @@ public class CreateImageShadow {
 		int h = img.getHeight();
 		
 		shadowLength = (int)(Math.sqrt(Math.multiplyExact(w, w) + Math.multiplyExact(h, h))*shadowLengthMultiplier);
+		tintLength = shadowLength/2;
 		
+		//
 		blackWhiteImg = createBlackWhiteImage(img, shadowLength);
 		imgOutline = createImageOutline(blackWhiteImg);
 		shadowBitSet = createShadowBitset(imgOutline, shadowLength);
 		shadowImg = createShadow(blackWhiteImg, backgroundImage, imgLocation, shadowBitSet);
-		completeShadowImg = addShadowOutlineTint(shadowImg);
 		
+		// Create 
+		blackWhiteShadowImg = createBlackWhiteImage(shadowImg, tintLength);
+		shadowImgOutline = createImageOutline(blackWhiteShadowImg);
+		shadowOutlineBitSet = createShadowBitset(shadowImgOutline, tintLength);
+		shadowOutlineImg = createShadow(blackWhiteShadowImg, backgroundImage, imgLocation, shadowOutlineBitSet);
+				
+		//
+		completeShadowImg = addShadowOutlineTint(shadowOutlineImg, blackWhiteShadowImg);
+		completeImg = addCompleteShadowToImg(img, completeShadowImg);
 	}
 
 	// Public Functions
@@ -73,8 +95,46 @@ public class CreateImageShadow {
 		return shadowImg;
 	}
 	
+	public BufferedImage getBlackWhiteShadowImage() {
+		return blackWhiteShadowImg;
+	}
+	
+	public BufferedImage getShadowImageOutline() {
+		return shadowImgOutline;
+	}
+	
+	public BufferedImage getShadowOutlineBitSetImage() {
+		
+		int w = blackWhiteShadowImg.getWidth();
+		int h = blackWhiteShadowImg.getHeight();
+		BufferedImage bsimg = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+		
+		for (int i = 0; i < w; i++) {
+			
+			for (int j = 0; j < h; j++) {
+				
+				if (shadowOutlineBitSet.get(i).get(j)) {
+					bsimg.setRGB(i, j, rgbBlack);
+				}
+				else {
+					bsimg.setRGB(i, j, rgbWhite);
+				}
+			}
+		}
+		
+		return bsimg;
+	}
+	
+	public BufferedImage getShadowOutlineImage() {
+		return shadowOutlineImg;
+	}
+	
 	public BufferedImage getCompleteShadowImage() {
 		return completeShadowImg;
+	}
+	
+	public BufferedImage getCompleteImage() {
+		return completeImg;
 	}
 	
 	// Private Functions
@@ -204,19 +264,17 @@ public class CreateImageShadow {
 		
 		bgColor = backgroundImg.getRGB(imgloc.x, imgloc.y);
 
-		int bgshadowcolor = getShadowColor(bgColor);
-		
-		System.out.println("BGShadowColor: " + String.valueOf(bgshadowcolor));
+		shadowColor = getShadowColor(bgColor);
 		
 		for (int i = 0; i < w; i++) {
 			
 			for (int j = 0; j < h; j++) {
 				
 				if (shadowBitSet.get(i).get(j)) {
-					shadowimg.setRGB(i, j, bgshadowcolor);
+					shadowimg.setRGB(i, j, shadowColor);
 				}
 				else if (bwimg.getRGB(i, j) == rgbBlack) {
-					shadowimg.setRGB(i, j, bgshadowcolor);
+					shadowimg.setRGB(i, j, shadowColor);
 				}
 				else {
 					shadowimg.setRGB(i, j, rgbAlpha);
@@ -227,55 +285,78 @@ public class CreateImageShadow {
 		return shadowimg;
 	}
 	
-	private BufferedImage createTintShadow(BufferedImage tintOutline, ArrayList<BitSet> shadowBitSet, int tintcolor) {
-
-		int w = tintOutline.getWidth();
-		int h = tintOutline.getHeight();
-		BufferedImage shadowimg = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+	private BufferedImage addShadowOutlineTint(BufferedImage tintimg, BufferedImage shadowimg) {
+		
+		int w = tintimg.getWidth();
+		int h = tintimg.getHeight();
+		
+		tintColor = getTintColor(bgColor);
+		
+		BufferedImage tintShadow = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		
 		for (int i = 0; i < w; i++) {
-		
-			for (int j = 0; j < h; j++) {
 			
-				if (shadowBitSet.get(i).get(j)) {
-					shadowimg.setRGB(i, j, tintcolor);
+			for (int j = 0; j < h; j++) {
+				
+				if (tintimg.getRGB(i, j) == shadowColor) {
+					tintShadow.setRGB(i, j, tintColor);
 				}
 				else {
-					shadowimg.setRGB(i, j, rgbAlpha);
+					tintShadow.setRGB(i, j, tintimg.getRGB(i, j));
+				}
+				
+				if (shadowimg.getRGB(i, j) == rgbBlack) {
+					tintShadow.setRGB(i, j, shadowColor);
 				}
 			}
 		}
-
-		return shadowimg;
+		
+		return tintShadow;
 	}
 	
-	private BufferedImage addShadowOutlineTint(BufferedImage shadowimg) {
+	private BufferedImage addCompleteShadowToImg(BufferedImage img, BufferedImage shadowimg) {
 		
-		int w = shadowimg.getWidth();
-		int h = shadowimg.getHeight();
+		int shadowW = shadowimg.getWidth();
+		int shadowH = shadowimg.getHeight();
 		
-		int newW = w + 2*shadowLength;
-		int newH = h + 2*shadowLength;
+		System.out.println("Shadow Size: " + String.valueOf(shadowW) + ", " + String.valueOf(shadowH));
 		
-		BufferedImage shadowOutlineImg = new BufferedImage(newW, newH, BufferedImage.TYPE_4BYTE_ABGR);
+		int imgW = img.getWidth();
+		int imgH = img.getHeight();
 		
-		int tintcolor = getTintColor(bgColor);
+		System.out.println("Img Size: " + String.valueOf(imgW) + ", " + String.valueOf(imgH));
 		
-		BufferedImage tintOutline = createImageOutline(shadowimg);
-		BufferedImage expandedTintOutline = new BufferedImage(newW, newH, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics g1 = expandedTintOutline.createGraphics();
-		g1.setColor(new Color(rgbWhite));
-		g1.fillRect(0, 0, newW, newH);
-		g1.drawImage(tintOutline, shadowLength, shadowLength, newW - shadowLength, newH - shadowLength, null);
+		int imgBorder = shadowLength + tintLength;
 		
-		ArrayList<BitSet> tintBitSet = createShadowBitset(expandedTintOutline, shadowLength);
-		BufferedImage tintShadow = createTintShadow(tintOutline, tintBitSet, tintcolor);
+		System.out.println("Img Border: " + String.valueOf(imgBorder));
 		
-		Graphics g2 = shadowOutlineImg.createGraphics();
-		g2.drawImage(tintShadow, 0, 0, newW, newH, null);
-		g2.drawImage(shadowimg, 0, 0, newW, newH, null);
+		BufferedImage imgwithshadow = new BufferedImage(shadowW, shadowH, BufferedImage.TYPE_4BYTE_ABGR);
 		
-		return shadowOutlineImg;
+		for (int i = 0; i < shadowW; i++) {
+			
+			for (int j = 0; j < shadowH; j++) {
+				
+				try {
+					if ((i < imgBorder) || (j < imgBorder) || (i > imgW + imgBorder - 1) || (j > imgH + imgBorder - 1)) {
+						imgwithshadow.setRGB(i, j, shadowimg.getRGB(i, j));
+					}
+					else if (isTransparent(img.getRGB(i-imgBorder, j-imgBorder))) {
+						imgwithshadow.setRGB(i, j, shadowimg.getRGB(i, j));
+					}
+					else {
+						imgwithshadow.setRGB(i, j, img.getRGB(i-imgBorder, j-imgBorder));
+					}
+				}
+				catch (Exception e) {
+					System.out.println("i: " + String.valueOf(i));
+					System.out.println("j: " + String.valueOf(j));
+					System.out.println(e.getStackTrace());
+					System.exit(1);
+				}
+			}
+		}
+	
+		return imgwithshadow;
 	}
 	
 	//
@@ -304,23 +385,12 @@ public class CreateImageShadow {
 		int GColor = Color.getGreen();
 		int BColor = Color.getBlue();
 		
-		System.out.println("Color: " + String.valueOf(color));
-		System.out.println("RColor: " + String.valueOf(RColor));
-		System.out.println("GColor: " + String.valueOf(GColor));
-		System.out.println("BColor: " + String.valueOf(BColor));
-		
-		int RTint = RColor + (int)((255 - RColor)*0.125f);
-		int GTint = GColor + (int)((255 - GColor)*0.125f);
-		int BTint = BColor + (int)((255 - BColor)*0.125f);
-		
-		System.out.println("RTint: " + String.valueOf(RTint));
-		System.out.println("GTint: " + String.valueOf(GTint));
-		System.out.println("BTint: " + String.valueOf(BTint));
+		int RTint = RColor + (int)((float)(255 - RColor)*0.25f);
+		int GTint = GColor + (int)((float)(255 - GColor)*0.25f);
+		int BTint = BColor + (int)((float)(255 - BColor)*0.25f);
 		
 		int tintcolor = new Color(RTint, GTint, BTint).getRGB();
-		
-		System.out.println("TintColor: " + String.valueOf(tintcolor));
-		
+				
 		return tintcolor;
 	}
 	

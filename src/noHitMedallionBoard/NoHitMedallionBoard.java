@@ -353,11 +353,11 @@ public class NoHitMedallionBoard implements ActionListener {
 	
 	private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h) {
 		
-		if (w == 0) {
+		if (w < 1) {
 			w = 100;
 		}
 		
-		if (h == 0) {
+		if (h < 1) {
 			h = 100;
 		}
 		

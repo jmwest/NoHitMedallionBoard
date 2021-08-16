@@ -4,8 +4,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageProducer;
 import java.io.File;
 
 import javax.imageio.ImageIO;
@@ -32,10 +30,7 @@ public class MedallionCombo implements ActionListener {
 	 *  [Complete] then make a gray scale version of the image to use on the button.
 	 */ 
 	private BufferedImage medallionGSBImage;
-	private BufferedImage medallionGSBImageWShadow;
 	private BufferedImage medallionBImage;
-	private BufferedImage medallionBImageWShadow;
-	private BufferedImage medallionShadowImage;
 	
 	public MedallionCombo(String medStr, String imgSrcStr, BufferedImage backGroundImage, Point location) {
 		
@@ -66,24 +61,12 @@ public class MedallionCombo implements ActionListener {
 			System.out.println(ex);
 			ex.printStackTrace();
 		}
-		
-		medallionGSBImage = getGrayScaleImage(medallionBImage);
-		
-		medallionShadowImage = createShadow(medallionBImage);
-		
-		medallionBImageWShadow = addShadowToImage(medallionBImage, medallionShadowImage);
-		medallionGSBImageWShadow = addShadowToImage(medallionGSBImage, medallionShadowImage);
-		
-		/*
-		 * Remove this later. Testing CreateImageShadow
-		 */
-		CreateImageShadow iBShadow = new CreateImageShadow(medallionBImage, backGroundImage,
-														   location, shadowLengthMultiplier);
-		CreateImageShadow iGSBShadow = new CreateImageShadow(medallionGSBImage, backGroundImage,
-															 location, shadowLengthMultiplier);
 
-		medallionBImage = iBShadow.getCompleteShadowImage();
-		medallionGSBImage = iGSBShadow.getCompleteShadowImage();
+		CreateImageShadow iShadow = new CreateImageShadow(medallionBImage, backGroundImage,
+														   location, shadowLengthMultiplier);
+		
+		medallionBImage = iShadow.getCompleteImage();
+		medallionGSBImage = iShadow.getCompleteShadowImage();
 		/*
 		 * 
 		 */
@@ -96,7 +79,6 @@ public class MedallionCombo implements ActionListener {
 		getMedallionTextArea().setPreferredSize(new Dimension(150, 40));
 		getMedallionTextArea().setMaximumSize(new Dimension(150, 60));
 		
-//		ImageIcon medallionIcon = getScaledIcon(medallionGSBImageWShadow, getMedallionButton());
 		ImageIcon medallionIcon = getScaledIcon(medallionGSBImage, getMedallionButton());
 		getMedallionButton().setIcon(medallionIcon);
 	}
@@ -104,11 +86,9 @@ public class MedallionCombo implements ActionListener {
 	// Public MedallionCombo functions
 	public void frameResizeEvent() {
 		if (medallionBGS) {
-//			changeButtonImage(getMedallionButton(), medallionGSBImageWShadow);
 			changeButtonImage(getMedallionButton(), medallionGSBImage);
 		}
 		else {
-//			changeButtonImage(getMedallionButton(), medallionBImageWShadow);
 			changeButtonImage(getMedallionButton(), medallionBImage);
 		}
 		
@@ -150,73 +130,6 @@ public class MedallionCombo implements ActionListener {
 		return newImg;
 	}
 	
-	private BufferedImage getGrayScaleImage(BufferedImage colorImg) {
-		
-		int w = colorImg.getWidth();
-		int h = colorImg.getHeight();
-			
-		BufferedImage newGSBImage = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
-			
-		try {
-			for (int i=0; i<h; i++) {
-				
-				for (int j=0; j<w; j++) { 
-					
-					Color c = new Color(colorImg.getRGB(j, i), true);
-					int red = (int)(c.getRed() * 0.299);
-					int green = (int)(c.getGreen() * 0.587);
-					int blue = (int)(c.getBlue() * 0.114);
-					
-					Color newColor = new Color(red + green + blue, red + green + blue, red + green + blue, c.getAlpha());
-					
-					newGSBImage.setRGB(j, i, newColor.getRGB());
-				}
-			}
-		}
-		catch (Exception e) {
-			System.out.println(e);
-			e.printStackTrace();
-		}
-		
-		return newGSBImage;
-	}
-	
-	private BufferedImage createShadow(BufferedImage img) {
-	    // a filter which converts all colors except 0 to black, leaving alpha in place
-
-	    ImageProducer prod = new FilteredImageSource(img.getSource(), new TransparentFilter(0.1f, true));
-	    // create the black image
-	    Image shadow = Toolkit.getDefaultToolkit().createImage(prod);
-
-	    // result
-	    BufferedImage result = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
-	    Graphics2D g = (Graphics2D) result.getGraphics();
-
-	    // draw shadow
-	    g.drawImage(shadow, 0, 0, null);
-
-	    return result;
-	}
-	
-	private BufferedImage addShadowToImage(BufferedImage img, BufferedImage shadow) {
-		
-		int originalW = img.getWidth();
-		int originalH = img.getHeight();
-		int newW = (int) (originalW * 1.15);
-		int newH = (int) (originalH * 1.15);
-		
-		int x_offset = (int) ((newW - originalW)/2);
-		int y_offset = (int) ((newH - originalH)/2);
-				
-		BufferedImage result = new BufferedImage(newW, newH, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics g = result.createGraphics();
-		g.drawImage(shadow, 0, 0, newW, newH, null);
-		g.drawImage(img, x_offset, y_offset, originalW, originalH, null);
-		g.dispose();
-		
-		return result;
-	}
-	
 	// Implement inherited functions
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -226,14 +139,12 @@ public class MedallionCombo implements ActionListener {
 				medallionBGS = false;
 				
 				JButton bSource = (JButton) e.getSource();
-//				changeButtonImage(bSource, medallionBImageWShadow);
 				changeButtonImage(bSource, medallionBImage);
 			}
 			else {
 				medallionBGS = true;
 				
 				JButton bSource = (JButton) e.getSource();
-//				changeButtonImage(bSource, medallionGSBImageWShadow);
 				changeButtonImage(bSource, medallionGSBImage);
 			}
 		}
