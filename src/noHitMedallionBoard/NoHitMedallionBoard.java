@@ -86,7 +86,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		
 		// 
 		badgePanelDimension.width = 150*4 + 20*3;
-		badgePanelDimension.height = 100*2 + 50*2 + 10*2 + 60;
+		badgePanelDimension.height = 100*2 + 50*2 + 40*2 + 10*2 + 60;
 		
 		//
 		ArrayList<Point> medAL = calculateMedallionLocations(6, badgePanelDimension.width, badgePanelDimension.height);
@@ -167,8 +167,12 @@ public class NoHitMedallionBoard implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 		
+		/* TODO
+		 *  Need to loop through the ArrayList and set visibility of components
+		 */
+		
 		// Set up EditMedalListMenuFrame
-		editMedalListMenuFrame = new EditMedalListMenuFrame(medallionArrayList);
+		editMedalListMenuFrame = new EditMedalListMenuFrame(this);
 		editMedalListMenuFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		editMedalListMenuFrame.setTitle("Edit Medal List");
 		editMedalListMenuFrame.pack();
@@ -180,6 +184,26 @@ public class NoHitMedallionBoard implements ActionListener {
 		
 		new NoHitMedallionBoard();
 
+	}
+	
+	// Public Functions	
+	public void closeEditMedalListMenuFrame() {
+		
+		editMedalListMenuFrame.setAlwaysOnTop(false);
+		editMedalListMenuFrame.setVisible(false);
+		
+		return;
+	}
+	
+	// Implement getter/setter functions
+	public ArrayList<MedallionCombo> getMedallionArrayList() {
+		return medallionArrayList;
+	}
+	
+	public void setMedallionArrayList(ArrayList<MedallionCombo> medArrayList) {
+		medallionArrayList = medArrayList;
+		
+		return;
 	}
 	
 	// Implement private Class functions
@@ -202,13 +226,12 @@ public class NoHitMedallionBoard implements ActionListener {
 				MedallionCombo currentMedallionCombo = medallions.get(j);
 				
 				ParallelGroup medallionParallelGroup = layout.createParallelGroup(Alignment.CENTER);
-				if (currentMedallionCombo.getIncludeMedallionText()) {
-					medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionTextPane());
-				}
+				medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionTextPane());
 				medallionParallelGroup.addComponent(currentMedallionCombo.getMedallionButton());
-				if (currentMedallionCombo.getIncludeNoHitText()) {
-					medallionParallelGroup.addComponent(currentMedallionCombo.getNoHitTextPane());
-				}
+				medallionParallelGroup.addComponent(currentMedallionCombo.getNoHitTextPane());
+				
+				layout.setHonorsVisibility(currentMedallionCombo.getMedallionTextPane(), false);
+				layout.setHonorsVisibility(currentMedallionCombo.getNoHitTextPane(), false);
 				
 				columnParallelGroup.addGroup(medallionParallelGroup);
 			}
@@ -231,15 +254,11 @@ public class NoHitMedallionBoard implements ActionListener {
 				MedallionCombo currentMedallionCombo = medallions.get(j);
 				
 				SequentialGroup medallionSequentialGroup = layout.createSequentialGroup();
-				if (currentMedallionCombo.getIncludeMedallionText()) {
-					medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionTextPane());
-					medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
-				}
+				medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionTextPane());
+				medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
 				medallionSequentialGroup.addComponent(currentMedallionCombo.getMedallionButton());
-				if (currentMedallionCombo.getIncludeNoHitText()) {
-					medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
-					medallionSequentialGroup.addComponent(currentMedallionCombo.getNoHitTextPane());
-				}
+				medallionSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 10);
+				medallionSequentialGroup.addComponent(currentMedallionCombo.getNoHitTextPane());
 				
 				rowParallelGroup.addGroup(medallionSequentialGroup);
 			}
@@ -394,7 +413,6 @@ public class NoHitMedallionBoard implements ActionListener {
 			
 		}
 		else if (e.getSource() == editMedalListMenuItem) {
-			System.out.println("Action Listener is working.");
 
 			editMedalListMenuFrame.setAlwaysOnTop(true);
 			editMedalListMenuFrame.setVisible(true);

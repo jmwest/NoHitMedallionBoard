@@ -32,7 +32,8 @@ public class MedallionCombo implements ActionListener {
 	private Boolean medallionBGS = true;
 	private String medallionButtonActionCommandStr;
 	
-	/*  Need to make functionality later that allows user to:
+	/*  TODO
+	 *  Need to make functionality later that allows user to:
 	 *  [] upload an image,
 	 *  [] save the image,
 	 *  [Complete] then make a gray scale version of the image to use on the button.
@@ -100,7 +101,7 @@ public class MedallionCombo implements ActionListener {
 		StyleConstants.setForeground(attributeSet, Color.white);
 		StyleConstants.setBackground(attributeSet, new Color(1.0f, 1.0f, 1.0f, 0.0f));		
 		noHitTextPane.setCharacterAttributes(attributeSet, true);
-		noHitTextPane.setText("No Hit");
+		noHitTextPane.setText("No Hit\nAny %");
 		noHitTextPane.setOpaque(false);
 		noHitTextPane.setEditable(false);
 		
