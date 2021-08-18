@@ -195,6 +195,30 @@ public class NoHitMedallionBoard implements ActionListener {
 		return;
 	}
 	
+	public ArrayList<Point> calculateMedallionLocations(int arraySize, int panelWidth, int panelHeight) {
+		
+		ArrayList<Point> locationAL = new ArrayList<Point>();
+		
+		int array_rows = 0;
+		
+		if (arraySize != 0) {
+			array_rows = 1 + (arraySize / 4);
+		}
+		
+		for (int i = 0; i < arraySize; i++) {
+			
+			int medallionrow = 1 + (i / 4);
+			int medallioncol = 1 + Math.floorMod(i, 4);
+			
+			int pointy = ((medallionrow * panelHeight) / (2 * array_rows));
+			int pointx = (medallioncol * panelWidth) / 8;
+			
+			locationAL.add(new Point(pointx, pointy));
+		}
+		
+		return locationAL;
+	}
+	
 	// Implement getter/setter functions
 	public ArrayList<MedallionCombo> getMedallionArrayList() {
 		return medallionArrayList;
@@ -202,6 +226,26 @@ public class NoHitMedallionBoard implements ActionListener {
 	
 	public void setMedallionArrayList(ArrayList<MedallionCombo> medArrayList) {
 		medallionArrayList = medArrayList;
+		
+		return;
+	}
+	
+	public BufferedImage getBackgroundLabelImage() {
+		return backgroundLabelImage;
+	}
+	
+	public void setBackgroundLabelImage(BufferedImage bgimg) {
+		backgroundLabelImage = bgimg;
+		
+		return;
+	}
+	
+	public Dimension getBadgePanelDimension() {
+		return badgePanelDimension;
+	}
+	
+	public void setBadgePanelDimension(Dimension badgedim) {
+		badgePanelDimension = badgedim;
 		
 		return;
 	}
@@ -311,30 +355,6 @@ public class NoHitMedallionBoard implements ActionListener {
 		return;
 	}
 	
-	private ArrayList<Point> calculateMedallionLocations(int arraySize, int panelWidth, int panelHeight) {
-		
-		ArrayList<Point> locationAL = new ArrayList<Point>();
-		
-		int array_rows = 0;
-		
-		if (arraySize != 0) {
-			array_rows = 1 + (arraySize / 4);
-		}
-		
-		for (int i = 0; i < arraySize; i++) {
-			
-			int medallionrow = 1 + (i / 4);
-			int medallioncol = 1 + Math.floorMod(i, 4);
-			
-			int pointy = ((medallionrow * panelHeight) / (2 * array_rows));
-			int pointx = (medallioncol * panelWidth) / 8;
-			
-			locationAL.add(new Point(pointx, pointy));
-		}
-		
-		return locationAL;
-	}
-	
 	private void saveProgram() {
 		
 	}
@@ -414,7 +434,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		}
 		else if (e.getSource() == editMedalListMenuItem) {
 
-			editMedalListMenuFrame.setAlwaysOnTop(true);
+			editMedalListMenuFrame.setAlwaysOnTop(false);
 			editMedalListMenuFrame.setVisible(true);
 		}
 	}

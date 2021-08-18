@@ -201,6 +201,26 @@ public class MedallionCombo implements ActionListener {
 	}
 
 	// Implement getter and setter functions
+	public BufferedImage getMedallionBImage() {
+		return medallionBImage;
+	}
+
+	public void setMedallionBImage(BufferedImage medallionbimg) {
+		this.medallionBImage = medallionbimg;
+		
+		return;
+	}
+	
+	public BufferedImage getMedallionGSBImage() {
+		return medallionGSBImage;
+	}
+
+	public void setMedallionGSBImage(BufferedImage medalliongsbimg) {
+		this.medallionGSBImage = medalliongsbimg;
+		
+		return;
+	}
+	
 	public JButton getMedallionButton() {
 		return medallionButton;
 	}

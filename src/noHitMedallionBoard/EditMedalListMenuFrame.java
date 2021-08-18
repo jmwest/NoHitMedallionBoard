@@ -1,14 +1,19 @@
 package noHitMedallionBoard;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -26,8 +31,10 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	private static final String medalTextCheckBoxString = "Medal Text Check Box";
 	private static final String noHitCheckBoxString = "No Hit Text Check Box";
 	private static final String changeMedalButtonString = "Change Medal Button";
+	
+	private float shadowLengthMultiplier = 0.02f;
 
-	private NoHitMedallionBoard parentBoard;
+	private NoHitMedallionBoard parentFrame;
 	private ArrayList<MedallionCombo> medallionComboArrayList;
 	
 	private JPanel editMLMFPanel;
@@ -43,12 +50,10 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	private ArrayList<JButton> changeMedalButtonArrayList;
 	private JButton addNewMedalButton;
 	private JButton saveButton;
-	
-	private JButton importImageButton;
-	
+		
 	public EditMedalListMenuFrame(NoHitMedallionBoard parent) {
 		
-		parentBoard = parent;
+		parentFrame = parent;
 		medallionComboArrayList = parent.getMedallionArrayList();
 		
 		// Initialize and set header TextAreas
@@ -174,7 +179,8 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 			MedallionCombo currentMedallionCombo = medallionCombos.get(i);
 			JButton changeButton = new JButton();
 			
-			changeButton.setActionCommand(currentMedallionCombo.getMedallionButton().getActionCommand());
+			changeButton.setName(currentMedallionCombo.getMedallionButton().getActionCommand());
+			changeButton.setActionCommand(changeMedalButtonString);
 			changeButton.setText("Import");
 			changeButton.addActionListener(this);
 			
@@ -330,6 +336,53 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		return layout;
 	}
 	
+	private void changeMedallionComboImage(MedallionCombo combo, File imgFile, Point comboPoint) {
+		
+		BufferedImage changedImage = openImageFile(imgFile);
+		
+		CreateImageShadow changedImageShadow = new CreateImageShadow(changedImage, parentFrame.getBackgroundLabelImage(),
+																	 comboPoint, shadowLengthMultiplier);
+		
+		combo.setMedallionBImage(changedImageShadow.getCompleteImage());
+		combo.setMedallionGSBImage(changedImageShadow.getCompleteShadowImage());
+		
+		combo.frameResizeEvent();
+		
+		return;
+	}
+	
+	private void createNewMedallionCombo() {
+		
+		
+		
+		return;
+	}
+	
+	private void deleteMedallionCombo() {
+		
+		
+		
+		return;
+	}
+	
+	private BufferedImage openImageFile(File file) {
+		
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		try {
+			System.out.println("Canonical path of target image: " + file.getCanonicalPath());
+            if (!file.exists()) {
+                System.out.println("file " + file + " does not exist");
+            }
+            image = ImageIO.read(file);
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
+		
+		return image;
+	}
+	
 	private void setPanelDimensions(JPanel panel, Dimension dim) {
 		
 		panel.setMinimumSize(dim);
@@ -384,21 +437,50 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 				}
 			}
 		}
+		else if (e.getActionCommand() == changeMedalButtonString) {
+			JButton source = (JButton) e.getSource(); 
+			
+			for (int i = 0; i < medallionComboArrayList.size(); i++) {
+				
+				MedallionCombo combo = medallionComboArrayList.get(i);
+				
+				if (source.getName() == combo.getMedallionButton().getActionCommand()) {
+					
+					JFileChooser jfc = new JFileChooser();
+				    jfc.showDialog(null,"Please Select the Image File");
+				    jfc.setVisible(true);
+				    System.out.println("File chooser visible.");
+				    
+				    if (jfc.getSelectedFile() == null) {
+				    	return;
+				    }
+				    
+				    File file = jfc.getSelectedFile();
+				    System.out.println("File name " + file.getName());
+
+				    Dimension bgDimension = parentFrame.getBadgePanelDimension();
+				    ArrayList<Point> pointArrayList = parentFrame.calculateMedallionLocations(medallionComboArrayList.size(),
+				    																		  bgDimension.width, bgDimension.height);
+				    
+					changeMedallionComboImage(combo, file, pointArrayList.get(i));
+				}
+			}
+		}
 		else if (e.getSource() == saveButton) {
-			
-			System.out.println("Action Listener is working.");
-			
+						
 			for (int i = 0; i < medallionComboArrayList.size(); i++) {
 				
 				MedallionCombo currentCombo = medallionComboArrayList.get(i);
 				
 				currentCombo.getMedallionTextPane().setVisible(currentCombo.getIncludeMedallionText());
 				currentCombo.getNoHitTextPane().setVisible(currentCombo.getIncludeNoHitText());
+				currentCombo.getMedallionTextPane().setText(medalTextArrayList.get(i).getText());
+				currentCombo.getNoHitTextPane().setText(medalNoHitArrayList.get(i).getText());
 			}
 			
-			parentBoard.setMedallionArrayList(medallionComboArrayList);
+			parentFrame.setMedallionArrayList(medallionComboArrayList);
 
-			parentBoard.closeEditMedalListMenuFrame();
+			parentFrame.closeEditMedalListMenuFrame();
 		}
 	}
 	
