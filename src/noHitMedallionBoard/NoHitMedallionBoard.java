@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,8 +50,10 @@ public class NoHitMedallionBoard implements ActionListener {
     
     private Dimension badgePanelDimension = new Dimension();
 
-    private String userLoadFilePathString = System.getProperty("user.dir") + "/resources/";
-    private String userSaveFilePathString = System.getProperty("user.dir") + "/resources/usersave.txt";
+    private String userLoadFilePathString = System.getProperty("user.dir") + System.getProperty("file.separator")
+											+ "resources" + System.getProperty("file.separator");
+    private String userSaveFilePathString = System.getProperty("user.dir") + System.getProperty("file.separator")
+    										+ "resources" + System.getProperty("file.separator") + "usersave.txt";
     private boolean useZeldaPreset = false;
     
 	private JMenuBar menuBar;
@@ -112,10 +115,10 @@ public class NoHitMedallionBoard implements ActionListener {
 		editMenu.add(editMedalListMenuItem);
 		
 		// Handle caseLabel image file
-		caseLabelImage = openImageFile(userLoadFilePathString + "Medal_Case_Background_Transparent_Gradient.png");
+		caseLabelImage = openResourceImageFile("Medal_Case_Background_Transparent_Gradient.png");
 		
 		// Handle caseLabel image file
-		backgroundLabelImage = openImageFile(userLoadFilePathString + "Medal_Case_Inset_With_Gradient.png");
+		backgroundLabelImage = openResourceImageFile("Medal_Case_Inset_With_Gradient.png");
 		
 		// 
 		badgePanelDimension.width = 150*4 + 20*3;
@@ -129,17 +132,17 @@ public class NoHitMedallionBoard implements ActionListener {
 			ArrayList<Point> medAL = calculateMedallionLocations(6, badgePanelDimension.width, badgePanelDimension.height);
 			
 			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
-									userLoadFilePathString + "Ocarina_of_Time.png", backgroundLabelImage, medAL.get(0)));
+								   "Ocarina_of_Time.png", backgroundLabelImage, medAL.get(0)));
 			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
-									userLoadFilePathString + "Majoras_Mask.png", backgroundLabelImage, medAL.get(1)));
+								   "Majoras_Mask.png", backgroundLabelImage, medAL.get(1)));
 			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
-									userLoadFilePathString + "Wind_Waker.png", backgroundLabelImage, medAL.get(2)));
+								   "Wind_Waker.png", backgroundLabelImage, medAL.get(2)));
 			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
-									userLoadFilePathString + "Fusedshadow.png", backgroundLabelImage, medAL.get(3)));
+									"Fusedshadow.png", backgroundLabelImage, medAL.get(3)));
 			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
-									userLoadFilePathString + "SS_Zelda.png", backgroundLabelImage, medAL.get(4)));
+									"SS_Zelda.png", backgroundLabelImage, medAL.get(4)));
 			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
-									userLoadFilePathString + "Hestus_Gift.png", backgroundLabelImage, medAL.get(5)));
+									"Hestus_Gift.png", backgroundLabelImage, medAL.get(5)));
 		}
 		
 		//
@@ -212,6 +215,7 @@ public class NoHitMedallionBoard implements ActionListener {
 	
 	public static void main(String[] args) {
 		
+		
 		File file = new File(System.getProperty("user.dir") + "/log.txt");
         FileOutputStream fos;
 		try {
@@ -226,6 +230,7 @@ public class NoHitMedallionBoard implements ActionListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		
 		System.out.println("Working dir:  " + System.getProperty("user.dir"));
 		
@@ -406,6 +411,8 @@ public class NoHitMedallionBoard implements ActionListener {
 	
 	private void loadProgram() {
 		
+		System.out.println("Load savefile: " + userSaveFilePathString);
+
 		File saveFile = new File(userSaveFilePathString);
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(saveFile))) {
@@ -442,7 +449,7 @@ public class NoHitMedallionBoard implements ActionListener {
 				}
 				else if (i == 4) {
 					noHitText = line;
-					noHitText = noHitText.replace("$$$NEWLINE$$$", "\n");
+					noHitText = noHitText.replaceAll("@@@@@@@@@@", System.getProperty("line.separator"));
 				}
 				else if (i == 5) {					
 		    		if (line.equalsIgnoreCase("true")) {
@@ -517,7 +524,8 @@ public class NoHitMedallionBoard implements ActionListener {
 				bufferWriter.newLine();
 				
 				String noHitString = currentCombo.getNoHitTextPane().getText();
-				noHitString = noHitString.replace(System.lineSeparator(), "$$$NEWLINE$$$");
+				noHitString = noHitString.replaceAll("\r\n", "@@@@@@@@@@");
+				noHitString = noHitString.replaceAll("\n", "@@@@@@@@@@");
 				
 				bufferWriter.write(noHitString);
 				bufferWriter.newLine();
@@ -538,29 +546,45 @@ public class NoHitMedallionBoard implements ActionListener {
 	}
 	
 	// Private Image functions
-	private BufferedImage openImageFile(String filename) {
+	private BufferedImage openResourceImageFile(String filename) {
 		
-		java.net.URL imageURL = NoHitMedallionBoard.class.getResource(filename);
+		System.out.println("Filename pass to openResourceImageFile: " + filename);
+		InputStream imageStream = this.getClass().getClassLoader().getResourceAsStream(filename);
 		
 		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
 
-		if (imageURL != null) {
+		if (imageStream != null) {
 
-			File imageFile = new File(filename);
-			
 			try {
-				System.out.println("Canonical path of target image: " + imageFile.getCanonicalPath());
-	            if (!imageFile.exists()) {
-	                System.out.println("file " + imageFile + " does not exist");
-	            }
-	            image = ImageIO.read(imageFile);
+	            image = ImageIO.read(imageStream);
 			} catch (Exception ex) {
 				System.out.println(ex);
 				ex.printStackTrace();
 			}
 		}
 		else {
-            System.out.println("file " + imageURL + " does not exist");
+            System.out.println("file " + filename + " does not exist");
+            
+            image = openImageFile(userLoadFilePathString + filename);
+		}
+		
+		return image;
+	}
+	
+	private BufferedImage openImageFile(String filename) {
+		
+		File file = new File(filename);
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		try {
+			System.out.println("Canonical path of target image: " + file.getCanonicalPath());
+            if (!file.exists()) {
+                System.out.println("file " + file + " does not exist");
+            }
+            image = ImageIO.read(file);
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		
 		return image;

@@ -59,7 +59,7 @@ public class CreateNewMedallionComboFrame extends JFrame implements ActionListen
 		medalNameHeader = new JTextPane();
 		medalNameTextArea = new JTextArea("");
 		medalNoHitHeader = new JTextPane();
-		medalNoHitTextArea = new JTextArea("No Hit\nAny Percent");
+		medalNoHitTextArea = new JTextArea("No Hit\nAny %");
 		
 		medalNameTextArea.setEditable(true);
 		medalNameTextArea.setLineWrap(false);

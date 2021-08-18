@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -22,7 +23,8 @@ public class MedallionCombo implements ActionListener {
 
     final static int defaultButtonSize=100;
     
-    private String userDirectoryFilePathString = System.getProperty("user.dir") + "/resources/";
+    private String userDirectoryFilePathString = System.getProperty("user.dir") + System.getProperty("file.separator")
+    												+ "resources" + System.getProperty("file.separator");
 	
 	private JButton medallionButton;
 	private JTextPane medallionText;
@@ -54,7 +56,7 @@ public class MedallionCombo implements ActionListener {
 	public MedallionCombo(String medStr, String imgSrcStr, BufferedImage backGroundImage, Point location) {
 		
 		// Handle image file
-		CreateImageShadow iShadow = new CreateImageShadow(openImageFile(imgSrcStr), backGroundImage,
+		CreateImageShadow iShadow = new CreateImageShadow(openResourceImageFile(imgSrcStr), backGroundImage,
 														   location, shadowLengthMultiplier);
 		
 		medallionBImage = iShadow.getCompleteImage();
@@ -152,7 +154,7 @@ public class MedallionCombo implements ActionListener {
 	
 	public void saveMedallionImagesToFile() {
 		
-		String medallionBImageFilePath = userDirectoryFilePathString + medallionText.getText() + ".png";
+		String medallionBImageFilePath = userDirectoryFilePathString + removeBadChars(medallionText.getText()) + ".png";
 		this.medallionBImageFilePath = medallionBImageFilePath;
 		
 		File medallionBImageSave = new File(medallionBImageFilePath);
@@ -164,6 +166,7 @@ public class MedallionCombo implements ActionListener {
 			}
 		
 			try {
+				System.out.println("Wrote BImage to: " + medallionBImageFilePath);
 			    ImageIO.write(medallionBImage, "png", medallionBImageSave);
 			} catch (IOException e) {
 				System.out.println(e);
@@ -171,7 +174,7 @@ public class MedallionCombo implements ActionListener {
 			}
 		}
 		
-		String medallionGSBImageFilePath = userDirectoryFilePathString + medallionText.getText() + "_GS.png";
+		String medallionGSBImageFilePath = userDirectoryFilePathString + removeBadChars(medallionText.getText()) + "_GS.png";
 		this.medallionGSBImageFilePath = medallionGSBImageFilePath;
 		
 		File medallionGSBImageSave = new File(medallionGSBImageFilePath);
@@ -183,6 +186,7 @@ public class MedallionCombo implements ActionListener {
 			}
 		
 			try {
+				System.out.println("Wrote GSBImage to: " + medallionGSBImageFilePath);
 			    ImageIO.write(medallionGSBImage, "png", medallionGSBImageSave);
 			} catch (IOException e) {
 				System.out.println(e);
@@ -191,18 +195,51 @@ public class MedallionCombo implements ActionListener {
 		}
 	}
 	
+	private String removeBadChars(String str) {
+		
+		return str.replaceAll(" ", "_").replaceAll("<", "").replaceAll(">", "").replaceAll(":", "").replaceAll("\"", "")
+					.replaceAll("\\/", "").replaceAll("|", "").replaceAll("\\?", "").replaceAll("\\*", "");
+	}
+	
 	// Private MedallionCombo functions
+	private BufferedImage openResourceImageFile(String filename) {
+		
+		System.out.println("Filename pass to openResourceImageFile: " + filename);
+		InputStream imageStream = NoHitMedallionBoard.class.getClassLoader().getResourceAsStream(filename);
+		
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+
+		if (imageStream != null) {
+
+			try {
+	            image = ImageIO.read(imageStream);
+			} catch (Exception ex) {
+				System.out.println(ex);
+				ex.printStackTrace();
+			}
+		}
+		else {
+            System.out.println("file " + filename + " does not exist");
+            
+            image = openImageFile(userDirectoryFilePathString + filename);
+		}
+		
+		return image;
+	}
+	
 	private BufferedImage openImageFile(String filename) {
 		
-		File imageFile = new File(filename);
+		System.out.println("Filename pass to openImageFile: " + filename);
+
+		File file = new File(filename);
 		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
 		
 		try {
-			System.out.println("Canonical path of target image: " + imageFile.getCanonicalPath());
-            if (!imageFile.exists()) {
-                System.out.println("file " + imageFile + " does not exist");
+			System.out.println("Canonical path of target image: " + file.getCanonicalPath());
+            if (!file.exists()) {
+                System.out.println("file " + file + " does not exist");
             }
-            image = ImageIO.read(imageFile);
+            image = ImageIO.read(file);
 		} catch (Exception ex) {
 			System.out.println(ex);
 			ex.printStackTrace();
