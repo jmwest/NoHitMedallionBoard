@@ -1,10 +1,14 @@
 package noHitMedallionBoard;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -17,6 +21,8 @@ import javax.swing.text.StyledDocument;
 public class MedallionCombo implements ActionListener {
 
     final static int defaultButtonSize=100;
+    
+    private String userDirectoryFilePathString = System.getProperty("user.dir") + "/resources/";
 	
 	private JButton medallionButton;
 	private JTextPane medallionText;
@@ -34,14 +40,44 @@ public class MedallionCombo implements ActionListener {
 	
 	/*  TODO
 	 *  Need to make functionality later that allows user to:
-	 *  [] upload an image,
+	 *  [Complete] upload an image,
 	 *  [] save the image,
 	 *  [Complete] then make a gray scale version of the image to use on the button.
 	 */ 
 	private BufferedImage medallionGSBImage;
 	private BufferedImage medallionBImage;
 	
+	private String medallionBImageFilePath;
+	private String medallionGSBImageFilePath;
+	
+	// Class Constructors
 	public MedallionCombo(String medStr, String imgSrcStr, BufferedImage backGroundImage, Point location) {
+		
+		// Handle image file
+		CreateImageShadow iShadow = new CreateImageShadow(openImageFile(imgSrcStr), backGroundImage,
+														   location, shadowLengthMultiplier);
+		
+		medallionBImage = iShadow.getCompleteImage();
+		medallionGSBImage = iShadow.getCompleteShadowImage();
+		
+		medallionComboSetup(medStr, "No Hit\nAny %");
+		
+		saveMedallionImagesToFile();
+	}
+	
+	public MedallionCombo(String medStr, BufferedImage medBImage, BufferedImage medGSBImage, String noHitStr) {
+		
+		// Handle images
+		medallionBImage = medBImage;
+		medallionGSBImage = medGSBImage;
+		
+		medallionComboSetup(medStr, noHitStr);
+		
+		saveMedallionImagesToFile();
+	}
+	
+	// Class Constructor helper function
+	private void medallionComboSetup(String medStr, String noHitStr) {
 		
 		medallionText = new JTextPane();
 		setMedallionButton(new JButton());
@@ -74,15 +110,7 @@ public class MedallionCombo implements ActionListener {
 		medallionButtonActionCommandStr = "change " + medStr + " button";
 		getMedallionButton().setActionCommand(medallionButtonActionCommandStr);
 		
-		// Handle image file
-		medallionBImage = openImageFile(imgSrcStr);
-
-		CreateImageShadow iShadow = new CreateImageShadow(medallionBImage, backGroundImage,
-														   location, shadowLengthMultiplier);
-		
-		medallionBImage = iShadow.getCompleteImage();
-		medallionGSBImage = iShadow.getCompleteShadowImage();
-		
+		// Handle images
 		getMedallionButton().setMinimumSize(new Dimension(buttonSize, buttonSize));
 		getMedallionButton().setPreferredSize(new Dimension(buttonSize, buttonSize));
 		getMedallionButton().setMaximumSize(new Dimension(buttonSize, buttonSize));
@@ -101,7 +129,7 @@ public class MedallionCombo implements ActionListener {
 		StyleConstants.setForeground(attributeSet, Color.white);
 		StyleConstants.setBackground(attributeSet, new Color(1.0f, 1.0f, 1.0f, 0.0f));		
 		noHitTextPane.setCharacterAttributes(attributeSet, true);
-		noHitTextPane.setText("No Hit\nAny %");
+		noHitTextPane.setText(noHitStr);
 		noHitTextPane.setOpaque(false);
 		noHitTextPane.setEditable(false);
 		
@@ -120,6 +148,47 @@ public class MedallionCombo implements ActionListener {
 		}
 		
 		return;
+	}
+	
+	public void saveMedallionImagesToFile() {
+		
+		String medallionBImageFilePath = userDirectoryFilePathString + medallionText.getText() + ".png";
+		this.medallionBImageFilePath = medallionBImageFilePath;
+		
+		File medallionBImageSave = new File(medallionBImageFilePath);
+		
+		if (!medallionBImageSave.exists()) {
+			File directory = new File(medallionBImageSave.getParent());
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
+		
+			try {
+			    ImageIO.write(medallionBImage, "png", medallionBImageSave);
+			} catch (IOException e) {
+				System.out.println(e);
+				e.printStackTrace();
+			}
+		}
+		
+		String medallionGSBImageFilePath = userDirectoryFilePathString + medallionText.getText() + "_GS.png";
+		this.medallionGSBImageFilePath = medallionGSBImageFilePath;
+		
+		File medallionGSBImageSave = new File(medallionGSBImageFilePath);
+		
+		if (!medallionGSBImageSave.exists()) {
+			File directory = new File(medallionGSBImageSave.getParent());
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
+		
+			try {
+			    ImageIO.write(medallionGSBImage, "png", medallionGSBImageSave);
+			} catch (IOException e) {
+				System.out.println(e);
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	// Private MedallionCombo functions
@@ -268,6 +337,8 @@ public class MedallionCombo implements ActionListener {
 	public void setIncludeMedallionText(Boolean includeMedallionText) {
 		this.includeMedallionText = includeMedallionText;
 		
+		getMedallionTextPane().setVisible(includeMedallionText);
+		
 		return;
 	}
 	
@@ -277,6 +348,38 @@ public class MedallionCombo implements ActionListener {
 
 	public void setIncludeNoHitText(Boolean includeNoHitText) {
 		this.includeNoHitText = includeNoHitText;
+		
+		getNoHitTextPane().setVisible(includeNoHitText);
+		
+		return;
+	}
+	
+	public String getMedallionBImageFilePath() {
+		return medallionBImageFilePath;
+	}
+
+	public void setMedallionBImageFilePath(String filePath) {
+		this.medallionBImageFilePath = filePath;
+		
+		return;
+	}
+	
+	public String getMedallionGSBImageFilePath() {
+		return medallionGSBImageFilePath;
+	}
+
+	public void setMedallionGSBImageFilePath(String filePath) {
+		this.medallionGSBImageFilePath = filePath;
+		
+		return;
+	}
+	
+	public boolean getMedallionBGS() {
+		return medallionBGS;
+	}
+	
+	public void setMedallionBGS(boolean medallionbgs) {
+		this.medallionBGS = medallionbgs;
 		
 		return;
 	}

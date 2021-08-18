@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -18,9 +21,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.LayoutStyle;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
 
 public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	/**
@@ -107,9 +107,9 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		medalNoHitArrayList = new ArrayList<JTextArea>();
 		changeMedalButtonArrayList = new ArrayList<JButton>();
 		
-		medalTextCheckBoxArrayList = createMedalCheckBoxs(medallionComboArrayList, medalTextCheckBoxString);
+		medalTextCheckBoxArrayList = createMedalTextCheckBoxs(medallionComboArrayList, medalTextCheckBoxString);
 		createMedalTextAreas(medallionComboArrayList);
-		medalNoHitCheckBoxArrayList = createMedalCheckBoxs(medallionComboArrayList, noHitCheckBoxString);
+		medalNoHitCheckBoxArrayList = createNoHitCheckBoxs(medallionComboArrayList, noHitCheckBoxString);
 		createChangeMedalButtons(medallionComboArrayList);
 		
 		editMLMFPanel = new JPanel();
@@ -122,8 +122,80 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		this.add(editMLMFPanel);
 	}
 	
-	// 
-	private ArrayList<JCheckBox> createMedalCheckBoxs(ArrayList<MedallionCombo> medallionCombos, String namestr) {
+	// Public Class Functions
+	public void addNewMedallionCombo(MedallionCombo combo) {
+		
+		medallionComboArrayList.add(combo);
+		
+		// Create new MedalTextCheckBox
+		JCheckBox medalTextCheckBox = new JCheckBox();
+		
+		medalTextCheckBox.setSelected(true);
+		medalTextCheckBox.setMinimumSize(new Dimension(25, 20));
+		medalTextCheckBox.setPreferredSize(new Dimension(25, 20));
+		medalTextCheckBox.setMaximumSize(new Dimension(25, 20));
+		
+		medalTextCheckBox.addActionListener(this);
+		medalTextCheckBox.setActionCommand(medalTextCheckBoxString);
+		medalTextCheckBox.setName(combo.getMedallionButton().getActionCommand());
+		
+		medalTextCheckBoxArrayList.add(medalTextCheckBox);
+		
+		// Create new MedalTextArea
+		JTextArea medalTextArea = new JTextArea(combo.getMedallionTextPane().getText());
+		
+		medalTextArea.setEditable(true);
+		medalTextArea.setLineWrap(false);
+		setJTextAreaDimensions(medalTextArea, 150, 300, 600, 20);
+		
+		medalTextArrayList.add(medalTextArea);
+		
+		// Create new NoHitTextCheckBox
+		JCheckBox noHitTextCheckBox = new JCheckBox();
+		
+		noHitTextCheckBox.setSelected(true);
+		noHitTextCheckBox.setMinimumSize(new Dimension(25, 20));
+		noHitTextCheckBox.setPreferredSize(new Dimension(25, 20));
+		noHitTextCheckBox.setMaximumSize(new Dimension(25, 20));
+		
+		noHitTextCheckBox.addActionListener(this);
+		noHitTextCheckBox.setActionCommand(medalTextCheckBoxString);
+		noHitTextCheckBox.setName(combo.getMedallionButton().getActionCommand());
+		
+		medalNoHitCheckBoxArrayList.add(noHitTextCheckBox);
+		
+		// Create new NoHitTextArea
+		JTextArea noHitTextArea = new JTextArea(combo.getNoHitTextPane().getText());
+		
+		noHitTextArea.setEditable(true);
+		noHitTextArea.setLineWrap(false);
+		setJTextAreaDimensions(noHitTextArea, 40, 50, 100, 40);
+		
+		medalNoHitArrayList.add(noHitTextArea);
+		
+		// Create new ChangeButton
+		JButton changeButton = new JButton();
+		
+		changeButton.setName(combo.getMedallionButton().getActionCommand());
+		changeButton.setActionCommand(changeMedalButtonString);
+		changeButton.setText("Import");
+		changeButton.addActionListener(this);
+		
+		changeButton.setMinimumSize(new Dimension(50, 20));
+		changeButton.setPreferredSize(new Dimension(50, 20));
+		changeButton.setMaximumSize(new Dimension(50, 20));
+		
+		changeMedalButtonArrayList.add(changeButton);
+		
+		// Redo Panel Layout
+		setPanelDimensions(editMLMFPanel, new Dimension(1000, 50*(medallionComboArrayList.size()+ 2)));
+		editMLMFPanel.setLayout(createBadgeGroupLayout(editMLMFPanel));
+		
+		return;
+	}
+	
+	// Private Class Functions
+	private ArrayList<JCheckBox> createMedalTextCheckBoxs(ArrayList<MedallionCombo> medallionCombos, String namestr) {
 		
 		ArrayList<JCheckBox> checkBoxs = new ArrayList<JCheckBox>();
 		
@@ -132,7 +204,31 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 			MedallionCombo currentMedallionCombo = medallionCombos.get(i);
 			JCheckBox newCheckBox = new JCheckBox();
 			
-			newCheckBox.setSelected(true);
+			newCheckBox.setSelected(currentMedallionCombo.getIncludeMedallionText());
+			newCheckBox.setMinimumSize(new Dimension(25, 20));
+			newCheckBox.setPreferredSize(new Dimension(25, 20));
+			newCheckBox.setMaximumSize(new Dimension(25, 20));
+			
+			newCheckBox.addActionListener(this);
+			newCheckBox.setActionCommand(namestr);
+			newCheckBox.setName(currentMedallionCombo.getMedallionButton().getActionCommand());
+			
+			checkBoxs.add(newCheckBox);
+		}
+		
+		return checkBoxs;
+	}
+	
+	private ArrayList<JCheckBox> createNoHitCheckBoxs(ArrayList<MedallionCombo> medallionCombos, String namestr) {
+		
+		ArrayList<JCheckBox> checkBoxs = new ArrayList<JCheckBox>();
+		
+		for (int i = 0; i < medallionCombos.size(); i++) {
+			
+			MedallionCombo currentMedallionCombo = medallionCombos.get(i);
+			JCheckBox newCheckBox = new JCheckBox();
+			
+			newCheckBox.setSelected(currentMedallionCombo.getIncludeNoHitText());
 			newCheckBox.setMinimumSize(new Dimension(25, 20));
 			newCheckBox.setPreferredSize(new Dimension(25, 20));
 			newCheckBox.setMaximumSize(new Dimension(25, 20));
@@ -351,15 +447,9 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		return;
 	}
 	
-	private void createNewMedallionCombo() {
-		
-		
-		
-		return;
-	}
-	
 	private void deleteMedallionCombo() {
 		
+		// TODO
 		
 		
 		return;
@@ -449,14 +539,12 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 					JFileChooser jfc = new JFileChooser();
 				    jfc.showDialog(null,"Please Select the Image File");
 				    jfc.setVisible(true);
-				    System.out.println("File chooser visible.");
 				    
 				    if (jfc.getSelectedFile() == null) {
 				    	return;
 				    }
 				    
 				    File file = jfc.getSelectedFile();
-				    System.out.println("File name " + file.getName());
 
 				    Dimension bgDimension = parentFrame.getBadgePanelDimension();
 				    ArrayList<Point> pointArrayList = parentFrame.calculateMedallionLocations(medallionComboArrayList.size(),
@@ -465,6 +553,19 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 					changeMedallionComboImage(combo, file, pointArrayList.get(i));
 				}
 			}
+		}
+		else if (e.getSource() == addNewMedalButton) {
+			
+			Dimension dim = parentFrame.getBadgePanelDimension();
+			ArrayList<Point> pts = parentFrame.calculateMedallionLocations(medallionComboArrayList.size() + 1, dim.width, dim.height);
+			Point pt = pts.get(pts.size() - 1);
+			
+			CreateNewMedallionComboFrame cnmcFrame = new CreateNewMedallionComboFrame(this, pt, parentFrame.getBackgroundLabelImage());
+			cnmcFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			cnmcFrame.setTitle("Add New Medal");
+			cnmcFrame.pack();
+			cnmcFrame.setAlwaysOnTop(false);
+			cnmcFrame.setVisible(true);
 		}
 		else if (e.getSource() == saveButton) {
 						
@@ -480,8 +581,10 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 			
 			parentFrame.setMedallionArrayList(medallionComboArrayList);
 
-			parentFrame.closeEditMedalListMenuFrame();
+			parentFrame.saveEditMedalListMenuFrame();
 		}
+		
+		return;
 	}
 	
 }

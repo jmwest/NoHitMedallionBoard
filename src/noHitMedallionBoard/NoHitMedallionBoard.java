@@ -1,20 +1,42 @@
 package noHitMedallionBoard;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.LayoutStyle;
+import javax.swing.OverlayLayout;
 
 public class NoHitMedallionBoard implements ActionListener {
 
@@ -27,6 +49,10 @@ public class NoHitMedallionBoard implements ActionListener {
     
     private Dimension badgePanelDimension = new Dimension();
 
+    private String userLoadFilePathString = System.getProperty("user.dir") + "/resources/";
+    private String userSaveFilePathString = System.getProperty("user.dir") + "/resources/usersave.txt";
+    private boolean useZeldaPreset = false;
+    
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem saveMenuItem;
@@ -47,11 +73,15 @@ public class NoHitMedallionBoard implements ActionListener {
 
 	public NoHitMedallionBoard() {
 		
+		System.out.println("Working Directory: " + System.getProperty("user.dir"));
+		
 		frame = new JFrame();
 		badgePanel = new JPanel();
 		casePanel = new JPanel();
 		
 		Insets insets = frame.getInsets();
+		
+		medallionArrayList = new ArrayList<MedallionCombo>();
 		
 		// Menu setup
 		menuBar = new JMenuBar();
@@ -74,38 +104,43 @@ public class NoHitMedallionBoard implements ActionListener {
 		
 		//
 		fileMenu.add(saveMenuItem);
-		fileMenu.add(preferencesMenuItem);
+		/* TODO
+		 * Implement preferencesMenuItem
+		 *fileMenu.add(preferencesMenuItem);
+		 */
 		
 		editMenu.add(editMedalListMenuItem);
 		
 		// Handle caseLabel image file
-		caseLabelImage = openImageFile("/Volumes/Seagate 2 TB Storage/Medal_Case_Background_Transparent.png");
+		caseLabelImage = openImageFile(userLoadFilePathString + "Medal_Case_Background_Transparent_Gradient.png");
 		
 		// Handle caseLabel image file
-		backgroundLabelImage = openImageFile("/Volumes/Seagate 2 TB Storage/Medal_Case_Inset_With_Gradient.png");
+		backgroundLabelImage = openImageFile(userLoadFilePathString + "Medal_Case_Inset_With_Gradient.png");
 		
 		// 
 		badgePanelDimension.width = 150*4 + 20*3;
 		badgePanelDimension.height = 100*2 + 50*2 + 40*2 + 10*2 + 60;
 		
-		//
-		ArrayList<Point> medAL = calculateMedallionLocations(6, badgePanelDimension.width, badgePanelDimension.height);
+		// Load Program Data from Save
+		loadProgram();
 		
-		//
-		medallionArrayList = new ArrayList<MedallionCombo>(); 
-		
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
-								"/Volumes/Seagate 2 TB Storage/Ocarina_of_Time.png", backgroundLabelImage, medAL.get(0)));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
-								"/Volumes/Seagate 2 TB Storage/Majoras_Mask.png", backgroundLabelImage, medAL.get(1)));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
-								"/Volumes/Seagate 2 TB Storage/Wind_Waker.png", backgroundLabelImage, medAL.get(2)));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
-								"/Volumes/Seagate 2 TB Storage/Fusedshadow.png", backgroundLabelImage, medAL.get(3)));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
-								"/Volumes/Seagate 2 TB Storage/SS_Zelda.png", backgroundLabelImage, medAL.get(4)));
-		medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
-								"/Volumes/Seagate 2 TB Storage/Hestus_Gift.png", backgroundLabelImage, medAL.get(5)));
+		if (useZeldaPreset) {
+			//
+			ArrayList<Point> medAL = calculateMedallionLocations(6, badgePanelDimension.width, badgePanelDimension.height);
+			
+			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Ocarina of Time",
+									userLoadFilePathString + "Ocarina_of_Time.png", backgroundLabelImage, medAL.get(0)));
+			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Majora's Mask",
+									userLoadFilePathString + "Majoras_Mask.png", backgroundLabelImage, medAL.get(1)));
+			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Wind Waker",
+									userLoadFilePathString + "Wind_Waker.png", backgroundLabelImage, medAL.get(2)));
+			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Twilight Princess",
+									userLoadFilePathString + "Fusedshadow.png", backgroundLabelImage, medAL.get(3)));
+			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Skyward Sword",
+									userLoadFilePathString + "SS_Zelda.png", backgroundLabelImage, medAL.get(4)));
+			medallionArrayList.add(new noHitMedallionBoard.MedallionCombo("The Legend of Zelda: Breath of the Wild",
+									userLoadFilePathString + "Hestus_Gift.png", backgroundLabelImage, medAL.get(5)));
+		}
 		
 		//
 		badgePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -122,7 +157,7 @@ public class NoHitMedallionBoard implements ActionListener {
 		int caseLabelWidth = (int)((caseLeft + caseAvailableWidth + caseRight) * caseRatioMult);
 		int caseLabelHeight = (int)((caseTop + caseAvailableHeight + caseBottom) * caseRatioMult);
 		
-		caseLabel = new JLabel(new ImageIcon(caseLabelImage));
+		caseLabel = new JLabel(getScaledLabelIcon(caseLabelImage, caseLabelWidth, caseLabelHeight));
 		caseLabel.setOpaque(false);
 		caseLabel.setMinimumSize(new Dimension(caseLabelWidth, caseLabelHeight));
 		caseLabel.setPreferredSize(new Dimension(caseLabelWidth, caseLabelHeight));
@@ -167,10 +202,6 @@ public class NoHitMedallionBoard implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 		
-		/* TODO
-		 *  Need to loop through the ArrayList and set visibility of components
-		 */
-		
 		// Set up EditMedalListMenuFrame
 		editMedalListMenuFrame = new EditMedalListMenuFrame(this);
 		editMedalListMenuFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -180,6 +211,22 @@ public class NoHitMedallionBoard implements ActionListener {
 	}
 	
 	public static void main(String[] args) {
+		
+		File file = new File(System.getProperty("user.dir") + "/log.txt");
+        FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(file);
+			
+			// Create new print stream for file.
+	        PrintStream ps = new PrintStream(fos);
+
+	        // Set file print stream.
+	        System.setOut(ps);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		System.out.println("Working dir:  " + System.getProperty("user.dir"));
 		
 		new NoHitMedallionBoard();
@@ -187,7 +234,9 @@ public class NoHitMedallionBoard implements ActionListener {
 	}
 	
 	// Public Functions	
-	public void closeEditMedalListMenuFrame() {
+	public void saveEditMedalListMenuFrame() {
+		
+		badgePanel.setLayout(createBadgeGroupLayout(badgePanel, medallionArrayList));
 		
 		editMedalListMenuFrame.setAlwaysOnTop(false);
 		editMedalListMenuFrame.setVisible(false);
@@ -355,25 +404,163 @@ public class NoHitMedallionBoard implements ActionListener {
 		return;
 	}
 	
+	private void loadProgram() {
+		
+		File saveFile = new File(userSaveFilePathString);
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(saveFile))) {
+		    String line;
+		    
+		    MedallionCombo currentCombo;
+		    String medallionText = "";
+		    boolean includeMedallionText = true;
+		    BufferedImage medallionBImageFromFile = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		    BufferedImage medallionGSBImageFromFile = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		    String noHitText = "";
+		    boolean includeNoHitText = true;
+		    boolean medallionBGS = true;
+
+		    int i = 0;
+		    while ((line = br.readLine()) != null) {
+		    	// process the line.
+		    	if (i == 0) {
+					medallionText = line;
+				}
+		    	else if (i == 1) {
+		    		if (line.equalsIgnoreCase("true")) {
+						includeMedallionText = true;
+					}
+		    		else {
+						includeMedallionText = false;
+					}
+				}
+		    	else if (i == 2) {
+					medallionBImageFromFile = openImageFile(line);
+				}
+		    	else if (i == 3) {
+					medallionGSBImageFromFile = openImageFile(line);
+				}
+				else if (i == 4) {
+					noHitText = line;
+					noHitText = noHitText.replace("$$$NEWLINE$$$", "\n");
+				}
+				else if (i == 5) {					
+		    		if (line.equalsIgnoreCase("true")) {
+						includeNoHitText = true;
+					}
+		    		else {
+		    			includeNoHitText = false;
+					}
+				}
+				else if (i == 6) {
+					i = -1;
+
+					if (line.equalsIgnoreCase("true")) {
+						medallionBGS = true;
+					}
+		    		else {
+		    			medallionBGS = false;
+					}
+					
+					currentCombo = new MedallionCombo(medallionText, medallionBImageFromFile,
+							  medallionGSBImageFromFile, noHitText);
+					currentCombo.setIncludeMedallionText(includeMedallionText);
+					currentCombo.setIncludeNoHitText(includeNoHitText);
+					currentCombo.setMedallionBGS(medallionBGS);
+					
+					medallionArrayList.add(currentCombo);
+				}
+		    	
+		    	i++;
+		    }
+		}
+		catch (Exception e) {
+			System.out.println("Excepton Occured: " + e.toString());
+			useZeldaPreset = true;
+		}
+		
+		return;
+	}
+	
 	private void saveProgram() {
 		
+		File userSave = new File(userSaveFilePathString);
+		
+		if (!userSave.exists()) {
+			try {
+				File directory = new File(userSave.getParent());
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+				userSave.createNewFile();
+			} catch (IOException e) {
+				System.out.println("Excepton Occured: " + e.toString());
+			}
+		}
+		
+		try {
+			FileWriter saveWriter;
+			saveWriter = new FileWriter(userSave.getAbsoluteFile(), false);
+ 
+			// Writes text to a character-output stream
+			BufferedWriter bufferWriter = new BufferedWriter(saveWriter);
+			for (int i = 0; i < medallionArrayList.size(); i++) {
+				MedallionCombo currentCombo = medallionArrayList.get(i);
+				
+				bufferWriter.write(currentCombo.getMedallionTextPane().getText());
+				bufferWriter.newLine();
+				bufferWriter.write(String.valueOf(currentCombo.getIncludeMedallionText()));
+				bufferWriter.newLine();
+				bufferWriter.write(currentCombo.getMedallionBImageFilePath());
+				bufferWriter.newLine();
+				bufferWriter.write(currentCombo.getMedallionGSBImageFilePath());
+				bufferWriter.newLine();
+				
+				String noHitString = currentCombo.getNoHitTextPane().getText();
+				noHitString = noHitString.replace(System.lineSeparator(), "$$$NEWLINE$$$");
+				
+				bufferWriter.write(noHitString);
+				bufferWriter.newLine();
+				bufferWriter.write(String.valueOf(currentCombo.getIncludeNoHitText()));
+				bufferWriter.newLine();
+				bufferWriter.write(String.valueOf(currentCombo.getMedallionBGS()));
+				bufferWriter.newLine();
+			}
+			
+			// Close FileWriter
+			bufferWriter.close();
+ 
+		} catch (IOException e) {
+			System.out.println("Excepton Occured: " + e.toString());
+		}
+		
+		return;
 	}
 	
 	// Private Image functions
 	private BufferedImage openImageFile(String filename) {
 		
-		File imageFile = new File(filename);
-		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+		java.net.URL imageURL = NoHitMedallionBoard.class.getResource(filename);
 		
-		try {
-			System.out.println("Canonical path of target image: " + imageFile.getCanonicalPath());
-            if (!imageFile.exists()) {
-                System.out.println("file " + imageFile + " does not exist");
-            }
-            image = ImageIO.read(imageFile);
-		} catch (Exception ex) {
-			System.out.println(ex);
-			ex.printStackTrace();
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+
+		if (imageURL != null) {
+
+			File imageFile = new File(filename);
+			
+			try {
+				System.out.println("Canonical path of target image: " + imageFile.getCanonicalPath());
+	            if (!imageFile.exists()) {
+	                System.out.println("file " + imageFile + " does not exist");
+	            }
+	            image = ImageIO.read(imageFile);
+			} catch (Exception ex) {
+				System.out.println(ex);
+				ex.printStackTrace();
+			}
+		}
+		else {
+            System.out.println("file " + imageURL + " does not exist");
 		}
 		
 		return image;
