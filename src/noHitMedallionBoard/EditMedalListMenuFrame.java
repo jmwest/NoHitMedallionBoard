@@ -1,5 +1,7 @@
 package noHitMedallionBoard;
 
+import java.awt.Color;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -14,13 +16,19 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.LayoutStyle;
+
+
 
 public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	/**
@@ -38,11 +46,11 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	private ArrayList<MedallionCombo> medallionComboArrayList;
 	
 	private JPanel editMLMFPanel;
-	private JTextArea medalTextCheckBoxHeader;
-	private JTextArea medalTextHeader;
-	private JTextArea medalNoHitCheckBoxHeader;
-	private JTextArea medalNoHitHeader;
-	private JTextArea changeMedalHeader;
+	private JTextPane medalTextCheckBoxHeader;
+	private JTextPane medalTextHeader;
+	private JTextPane medalNoHitCheckBoxHeader;
+	private JTextPane medalNoHitHeader;
+	private JTextPane changeMedalHeader;
 	private ArrayList<JCheckBox> medalTextCheckBoxArrayList;
 	private ArrayList<JTextArea> medalTextArrayList;
 	private ArrayList<JCheckBox> medalNoHitCheckBoxArrayList;
@@ -487,6 +495,35 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		textArea.setMinimumSize(new Dimension(minwidth, height));
 		textArea.setPreferredSize(new Dimension(prefwidth, height));
 		textArea.setMaximumSize(new Dimension(maxwidth, height));
+		
+		return;
+	}
+	
+	private void setTextPaneAttributes(Alignment align, JTextPane pane, String paneText,
+			boolean editable, boolean bold) {
+
+		// Create Alignment
+		SimpleAttributeSet alignment = new SimpleAttributeSet();
+		
+		if (align == noHitMedallionBoard.Alignment.RIGHT) {
+			
+		}
+		StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_LEFT);
+		
+		StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_CENTER);
+		
+		
+		SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+		StyleConstants.setForeground(attributeSet, Color.black);
+		StyleConstants.setBackground(attributeSet, new Color(1.0f, 1.0f, 1.0f, 0.0f));	
+		StyleConstants.setBold(attributeSet, bold);
+		pane.setCharacterAttributes(attributeSet, true);
+		pane.setText(paneText);
+		pane.setOpaque(false);
+		pane.setEditable(editable);
+		
+		StyledDocument paneDoc = pane.getStyledDocument();
+		paneDoc.setParagraphAttributes(0, paneDoc.getLength(), alignment, false);
 		
 		return;
 	}

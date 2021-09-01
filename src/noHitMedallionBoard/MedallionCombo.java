@@ -92,9 +92,7 @@ public class MedallionCombo implements ActionListener {
 		getMedallionButton().setBorderPainted(false);
 		getMedallionButton().setFocusPainted(false);
 		
-		//
-		medallionText.setEditable(false);
-		
+		//		
 		SimpleAttributeSet attributeSet = new SimpleAttributeSet();
 		StyleConstants.setForeground(attributeSet, Color.white);
 		StyleConstants.setBackground(attributeSet, new Color(1.0f, 1.0f, 1.0f, 0.0f));		
