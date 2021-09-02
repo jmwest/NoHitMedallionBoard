@@ -215,7 +215,7 @@ public class NoHitMedallionBoard implements ActionListener {
 	
 	public static void main(String[] args) {
 		
-		
+		/*
 		File file = new File(System.getProperty("user.dir") + "/log.txt");
         FileOutputStream fos;
 		try {
@@ -230,7 +230,7 @@ public class NoHitMedallionBoard implements ActionListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		*/
 		
 		System.out.println("Working dir:  " + System.getProperty("user.dir"));
 		
@@ -271,6 +271,28 @@ public class NoHitMedallionBoard implements ActionListener {
 		}
 		
 		return locationAL;
+	}
+	
+	public void removeMedallionComboFromPanel(MedallionCombo combo) {
+		
+		badgePanel.remove(combo.getMedallionButton());
+		badgePanel.remove(combo.getMedallionTextPane());
+		badgePanel.remove(combo.getNoHitTextPane());
+		
+		badgePanel.getLayout().removeLayoutComponent(combo.getMedallionButton());
+		badgePanel.getLayout().removeLayoutComponent(combo.getMedallionTextPane());
+		badgePanel.getLayout().removeLayoutComponent(combo.getNoHitTextPane());
+		
+		badgePanel.revalidate();
+		badgePanel.repaint();
+		
+		return;
+	}
+	
+	public void refreshCasePanelLayout() {
+		casePanel.setLayout(createCaseOverlayLayout(casePanel));
+
+		return;
 	}
 	
 	// Implement getter/setter functions

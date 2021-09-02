@@ -89,7 +89,6 @@ public class MedallionCombo implements ActionListener {
 		getMedallionButton().setBorderPainted(false);
 		getMedallionButton().setRolloverEnabled(false);
 		getMedallionButton().setContentAreaFilled(false);
-		getMedallionButton().setBorderPainted(false);
 		getMedallionButton().setFocusPainted(false);
 		
 		//		
@@ -417,5 +416,9 @@ public class MedallionCombo implements ActionListener {
 		this.medallionBGS = medallionbgs;
 		
 		return;
+	}
+	
+	public String getMedallionActionCommandString() {
+		return medallionButtonActionCommandStr;
 	}
 }

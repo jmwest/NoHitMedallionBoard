@@ -36,6 +36,7 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	 */
 	private static final long serialVersionUID = -1061822005019075338L;
 	
+	private static final String deleteMedalString = "Delete Medal";
 	private static final String medalTextCheckBoxString = "Medal Text Check Box";
 	private static final String noHitCheckBoxString = "No Hit Text Check Box";
 	private static final String changeMedalButtonString = "Change Medal Button";
@@ -46,16 +47,21 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 	private ArrayList<MedallionCombo> medallionComboArrayList;
 	
 	private JPanel editMLMFPanel;
+	
+	private JTextPane deleteMedalHeader;
 	private JTextPane medalTextCheckBoxHeader;
 	private JTextPane medalTextHeader;
 	private JTextPane medalNoHitCheckBoxHeader;
 	private JTextPane medalNoHitHeader;
 	private JTextPane changeMedalHeader;
+	
+	private ArrayList<JButton> deleteMedalButtonArrayList;
 	private ArrayList<JCheckBox> medalTextCheckBoxArrayList;
 	private ArrayList<JTextArea> medalTextArrayList;
 	private ArrayList<JCheckBox> medalNoHitCheckBoxArrayList;
 	private ArrayList<JTextArea> medalNoHitArrayList;
 	private ArrayList<JButton> changeMedalButtonArrayList;
+	
 	private JButton addNewMedalButton;
 	private JButton saveButton;
 		
@@ -65,32 +71,26 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		medallionComboArrayList = parent.getMedallionArrayList();
 		
 		// Initialize and set header TextAreas
-		medalTextCheckBoxHeader = new JTextArea("Include Title Text");
-		medalTextHeader = new JTextArea("Edit Title Text");
-		medalNoHitCheckBoxHeader = new JTextArea("Include Challenge Text");
-		medalNoHitHeader = new JTextArea("Edit Challenge Text");
-		changeMedalHeader = new JTextArea("Change Medal Image");
+		deleteMedalHeader = new JTextPane();
+		medalTextCheckBoxHeader = new JTextPane();
+		medalTextHeader = new JTextPane();
+		medalNoHitCheckBoxHeader = new JTextPane();
+		medalNoHitHeader = new JTextPane();
+		changeMedalHeader = new JTextPane();
 		
-		medalTextCheckBoxHeader.setEditable(false);
-		medalTextCheckBoxHeader.setLineWrap(false);
+		setJTextPaneDimensions(deleteMedalHeader, 50, 75, 150, 20);
+		setJTextPaneDimensions(medalTextCheckBoxHeader, 100, 150, 200, 20);
+		setJTextPaneDimensions(medalTextHeader, 100, 150, 200, 20);
+		setJTextPaneDimensions(medalNoHitCheckBoxHeader, 150, 150, 200, 20);
+		setJTextPaneDimensions(medalNoHitHeader, 100, 150, 200, 20);
+		setJTextPaneDimensions(changeMedalHeader, 100, 150, 200, 20);
 		
-		medalTextHeader.setEditable(false);
-		medalTextHeader.setLineWrap(false);
-		
-		medalNoHitCheckBoxHeader.setEditable(false);
-		medalNoHitCheckBoxHeader.setLineWrap(false);
-		
-		medalNoHitHeader.setEditable(false);
-		medalNoHitHeader.setLineWrap(false);
-		
-		changeMedalHeader.setEditable(false);
-		changeMedalHeader.setLineWrap(false);
-		
-		setJTextAreaDimensions(medalTextCheckBoxHeader, 100, 150, 200, 20);
-		setJTextAreaDimensions(medalTextHeader, 100, 150, 200, 20);
-		setJTextAreaDimensions(medalNoHitCheckBoxHeader, 150, 150, 200, 20);
-		setJTextAreaDimensions(medalNoHitHeader, 100, 150, 200, 20);
-		setJTextAreaDimensions(changeMedalHeader, 100, 150, 200, 20);
+		setTextPaneAttributes(noHitMedallionBoard.Alignment.CENTER, deleteMedalHeader, "Delete", false, true);
+		setTextPaneAttributes(noHitMedallionBoard.Alignment.CENTER, medalTextCheckBoxHeader, "Include Title Text", false, true);
+		setTextPaneAttributes(noHitMedallionBoard.Alignment.CENTER, medalTextHeader, "Edit Title Text", false, true);
+		setTextPaneAttributes(noHitMedallionBoard.Alignment.CENTER, medalNoHitCheckBoxHeader, "Include Challenge Text", false, true);
+		setTextPaneAttributes(noHitMedallionBoard.Alignment.CENTER, medalNoHitHeader, "Edit Challenge Text", false, true);
+		setTextPaneAttributes(noHitMedallionBoard.Alignment.CENTER, changeMedalHeader, "Change Medal Image", false, true);
 		
 		// Initialize and Set Save and AddNewMedal Buttons        
 		addNewMedalButton = new JButton();
@@ -111,10 +111,12 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		saveButton.setMaximumSize(new Dimension(100, 20));
 
 		// Initialize Array Lists
+		deleteMedalButtonArrayList = new ArrayList<JButton>();
 		medalTextArrayList = new ArrayList<JTextArea>();
 		medalNoHitArrayList = new ArrayList<JTextArea>();
 		changeMedalButtonArrayList = new ArrayList<JButton>();
 		
+		createDeleteMedalButtons(medallionComboArrayList);
 		medalTextCheckBoxArrayList = createMedalTextCheckBoxs(medallionComboArrayList, medalTextCheckBoxString);
 		createMedalTextAreas(medallionComboArrayList);
 		medalNoHitCheckBoxArrayList = createNoHitCheckBoxs(medallionComboArrayList, noHitCheckBoxString);
@@ -125,7 +127,7 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		editMLMFPanel.setOpaque(false);
 		editMLMFPanel.setLayout(createBadgeGroupLayout(editMLMFPanel));
 		
-		setPanelDimensions(editMLMFPanel, new Dimension(1000, 50*(medallionComboArrayList.size()+ 2)));
+		setPanelDimensions(editMLMFPanel, new Dimension(1100, 50*(medallionComboArrayList.size()+ 2)));
 		
 		this.add(editMLMFPanel);
 	}
@@ -261,6 +263,7 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 			medalTextArea.setEditable(true);
 			medalTextArea.setLineWrap(false);
 			setJTextAreaDimensions(medalTextArea, 150, 300, 600, 20);
+			medalTextArea.setName(currentMedallionCombo.getMedallionButton().getActionCommand());
 			
 			medalTextArrayList.add(medalTextArea);
 			
@@ -269,7 +272,8 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 			noHitTextArea.setEditable(true);
 			noHitTextArea.setLineWrap(false);
 			setJTextAreaDimensions(noHitTextArea, 40, 50, 100, 40);
-			
+			noHitTextArea.setName(currentMedallionCombo.getMedallionButton().getActionCommand());
+
 			medalNoHitArrayList.add(noHitTextArea);
 		}
 		
@@ -298,21 +302,65 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		return;
 	}
 	
-	private GroupLayout createBadgeGroupLayout(JPanel panel) {
+	private void createDeleteMedalButtons(ArrayList<MedallionCombo> medallionCombos) {
 		
+		for (int i = 0; i < medallionCombos.size(); i++) {
+			
+			MedallionCombo currentMedallionCombo = medallionCombos.get(i);
+			JButton deleteButton = new JButton();
+			
+			deleteButton.setName(currentMedallionCombo.getMedallionButton().getActionCommand());
+			deleteButton.setActionCommand(deleteMedalString);
+			deleteButton.setText("X");
+			deleteButton.setForeground(Color.RED);
+			deleteButton.addActionListener(this);
+			deleteButton.setBorderPainted(false);
+			deleteButton.setRolloverEnabled(false);
+			deleteButton.setContentAreaFilled(false);
+			deleteButton.setFocusPainted(false);
+			deleteButton.setBorder(null);
+			
+			deleteButton.setMinimumSize(new Dimension(20, 20));
+			deleteButton.setPreferredSize(new Dimension(30, 20));
+			deleteButton.setMaximumSize(new Dimension(40, 20));
+			
+			deleteMedalButtonArrayList.add(deleteButton);
+		}
+		
+		return;
+	}
+	
+	private GroupLayout createBadgeGroupLayout(JPanel panel) {
+
 		GroupLayout layout = new GroupLayout(panel);
 
 		layout.setAutoCreateGaps(false);
 		layout.setAutoCreateContainerGaps(false);
 		
+		////////////////////////////
 		/*
 		 *  Horizontal Alignment
 		 */
+		////////////////////////////
 		ParallelGroup topLevelParallelGroup = layout.createParallelGroup(Alignment.CENTER);
 		
 		SequentialGroup rowSequentialGroup = layout.createSequentialGroup();
 		
-		//FIRST COLUMN
+		// Instead of renaming all the columns, adding the delete button to the front as a 'zero' column
+		// ZEROTH COLUMN
+		ParallelGroup zeroColumnParallelGroup = layout.createParallelGroup(Alignment.CENTER);
+		zeroColumnParallelGroup.addComponent(deleteMedalHeader);
+		
+		// Iterate over the ArrayList to create horizontal layout groupings
+		for (int i = 0; i < deleteMedalButtonArrayList.size(); i++) {
+							
+			zeroColumnParallelGroup.addComponent(deleteMedalButtonArrayList.get(i));			
+		}
+		
+		rowSequentialGroup.addGroup(zeroColumnParallelGroup);
+		rowSequentialGroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 10, 15);
+		
+		// FIRST COLUMN
 		ParallelGroup firstColumnParallelGroup = layout.createParallelGroup(Alignment.CENTER);
 		firstColumnParallelGroup.addComponent(medalTextCheckBoxHeader);
 		
@@ -369,7 +417,7 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		fifthColumnParallelGroup.addComponent(changeMedalHeader);
 		
 		// Iterate over the ArrayList to create next parallel grouping
-		for (int i = 0; i < medalNoHitArrayList.size(); i++) {
+		for (int i = 0; i < changeMedalButtonArrayList.size(); i++) {
 							
 			fifthColumnParallelGroup.addComponent(changeMedalButtonArrayList.get(i));			
 		}
@@ -394,14 +442,17 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		// Finalize Horizontal Layout
 		layout.setHorizontalGroup(topLevelParallelGroup);
 		
+		///////////////////////////
 		/*
 		 *  Vertical Alignment
 		 */
+		///////////////////////////
 		SequentialGroup columnSequentialGroup = layout.createSequentialGroup();
 		
 		// Set Layout for Header
 		ParallelGroup headerParallelGroup = layout.createParallelGroup(Alignment.CENTER);
 		
+		headerParallelGroup.addComponent(deleteMedalHeader);
 		headerParallelGroup.addComponent(medalTextCheckBoxHeader);
 		headerParallelGroup.addComponent(medalTextHeader);
 		headerParallelGroup.addComponent(medalNoHitCheckBoxHeader);
@@ -416,6 +467,7 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 			
 			ParallelGroup rowParallelGroup = layout.createParallelGroup(Alignment.CENTER);
 			
+			rowParallelGroup.addComponent(deleteMedalButtonArrayList.get(i));
 			rowParallelGroup.addComponent(medalTextCheckBoxArrayList.get(i));
 			rowParallelGroup.addComponent(medalTextArrayList.get(i));
 			rowParallelGroup.addComponent(medalNoHitCheckBoxArrayList.get(i));
@@ -455,10 +507,81 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		return;
 	}
 	
-	private void deleteMedallionCombo() {
+	private void deleteMedallionCombo(JButton delButton) {
 		
-		// TODO
+		for (int i = 0; i < deleteMedalButtonArrayList.size(); i++) {
+
+			if (delButton.getName() == deleteMedalButtonArrayList.get(i).getName()) {
+				editMLMFPanel.remove(deleteMedalButtonArrayList.get(i));
+				editMLMFPanel.getLayout().removeLayoutComponent(deleteMedalButtonArrayList.get(i));
+				deleteMedalButtonArrayList.remove(i);
+				i--;
+			}
+		}
 		
+		for (int i = 0; i < medalTextCheckBoxArrayList.size(); i++) {
+
+			if (delButton.getName() == medalTextCheckBoxArrayList.get(i).getName()) {
+				editMLMFPanel.remove(medalTextCheckBoxArrayList.get(i));
+				editMLMFPanel.getLayout().removeLayoutComponent(medalTextCheckBoxArrayList.get(i));
+				medalTextCheckBoxArrayList.remove(i);
+				i--;
+			}
+		}
+		
+		for (int i = 0; i < medalTextArrayList.size(); i++) {
+
+			if (delButton.getName() == medalTextArrayList.get(i).getName()) {
+				editMLMFPanel.remove(medalTextArrayList.get(i));
+				editMLMFPanel.getLayout().removeLayoutComponent(medalTextArrayList.get(i));
+				medalTextArrayList.remove(i);
+				i--;
+			}
+		}
+		
+		for (int i = 0; i < medalNoHitCheckBoxArrayList.size(); i++) {
+
+			if (delButton.getName() == medalNoHitCheckBoxArrayList.get(i).getName()) {
+				editMLMFPanel.remove(medalNoHitCheckBoxArrayList.get(i));
+				editMLMFPanel.getLayout().removeLayoutComponent(medalNoHitCheckBoxArrayList.get(i));
+				medalNoHitCheckBoxArrayList.remove(i);
+				i--;
+			}
+		}
+		
+		for (int i = 0; i < medalNoHitArrayList.size(); i++) {
+
+			if (delButton.getName() == medalNoHitArrayList.get(i).getName()) {
+				editMLMFPanel.remove(medalNoHitArrayList.get(i));
+				editMLMFPanel.getLayout().removeLayoutComponent(medalNoHitArrayList.get(i));
+				medalNoHitArrayList.remove(i);
+				i--;
+			}
+		}
+		
+		for (int i = 0; i < changeMedalButtonArrayList.size(); i++) {
+
+			if (delButton.getName() == changeMedalButtonArrayList.get(i).getName()) {
+				editMLMFPanel.remove(changeMedalButtonArrayList.get(i));
+				editMLMFPanel.getLayout().removeLayoutComponent(changeMedalButtonArrayList.get(i));
+				changeMedalButtonArrayList.remove(i);
+				i--;
+			}
+		}
+		
+		for (int i = 0; i < medallionComboArrayList.size(); i++) {
+			
+			if (delButton.getName() == medallionComboArrayList.get(i).getMedallionActionCommandString()) {
+				parentFrame.removeMedallionComboFromPanel(medallionComboArrayList.get(i));
+				medallionComboArrayList.remove(i);
+				i--;
+			}
+		}
+		
+		editMLMFPanel.revalidate();
+		editMLMFPanel.repaint();
+		//editMLMFPanel.setLayout(createBadgeGroupLayout(editMLMFPanel));
+		//parentFrame.refreshCasePanelLayout();
 		
 		return;
 	}
@@ -499,19 +622,33 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 		return;
 	}
 	
-	private void setTextPaneAttributes(Alignment align, JTextPane pane, String paneText,
+	private void setJTextPaneDimensions(JTextPane textPane, int minwidth, int prefwidth, int maxwidth, int height) {
+		
+		textPane.setMinimumSize(new Dimension(minwidth, height));
+		textPane.setPreferredSize(new Dimension(prefwidth, height));
+		textPane.setMaximumSize(new Dimension(maxwidth, height));
+		
+		return;
+	}
+	
+	private void setTextPaneAttributes(noHitMedallionBoard.Alignment align, JTextPane pane, String paneText,
 			boolean editable, boolean bold) {
 
 		// Create Alignment
 		SimpleAttributeSet alignment = new SimpleAttributeSet();
 		
 		if (align == noHitMedallionBoard.Alignment.RIGHT) {
-			
+			StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_RIGHT);
 		}
-		StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_LEFT);
-		
-		StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_CENTER);
-		
+		else if (align == noHitMedallionBoard.Alignment.CENTER) {
+			StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_CENTER);
+		}
+		else if (align == noHitMedallionBoard.Alignment.LEFT) {
+			StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_LEFT);
+		}
+		else if (align == noHitMedallionBoard.Alignment.JUSTIFIED) {
+			StyleConstants.setAlignment(alignment, StyleConstants.ALIGN_JUSTIFIED);
+		}
 		
 		SimpleAttributeSet attributeSet = new SimpleAttributeSet();
 		StyleConstants.setForeground(attributeSet, Color.black);
@@ -590,6 +727,11 @@ public class EditMedalListMenuFrame extends JFrame implements ActionListener {
 					changeMedallionComboImage(combo, file, pointArrayList.get(i));
 				}
 			}
+		}
+		else if (e.getActionCommand() == deleteMedalString) {
+			JButton source = (JButton) e.getSource(); 
+
+			deleteMedallionCombo(source);
 		}
 		else if (e.getSource() == addNewMedalButton) {
 			
